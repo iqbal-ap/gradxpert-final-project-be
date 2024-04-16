@@ -1,0 +1,836 @@
+openapi: '3.0.2'
+info:
+  title: H8Connect API
+  version: '1.0'
+components:
+  securitySchemes:
+    authentication:
+      type: http
+      scheme: bearer
+  schemas:
+    responseCreate:
+      type: object
+      properties:
+        status:
+          type: string 
+          example: Success
+        code: 
+          type: integer
+          example: 201
+        message:
+          type: string
+          example: Successfully create data
+        data: 
+          type: object
+          additionalProperties: false
+    responseUpdate:
+      type: object
+      properties:
+        status:
+          type: string 
+          example: Success
+        code: 
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Successfully update data
+        data: 
+          type: object
+          additionalProperties: false
+    responseDelete:
+      type: object
+      properties:
+        status:
+          type: string 
+          example: Success
+        code: 
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Successfully delete data
+        data: 
+          type: object
+          additionalProperties: false
+    responseGetListService:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name: 
+          type: string 
+          example: service 1
+        typeId:
+          type: integer
+          example: 2
+        type:
+          $ref: "#/components/schemas/detailDataServiceType"
+        description:
+          type: string
+          example: lorem ipsum
+        rating:
+          type: number
+          example: 4.5
+        address:
+          type: string 
+          example: Jl. something
+        phoneNumber:
+          type: string
+          example: 0271812312
+        createdAt:
+          type: string
+          format: date-time
+          example: 
+        updatedAt:
+          type: string
+          format: date-time
+          example: 
+        deletedAt:
+          type: string 
+          format: date-time
+          example:
+    detailDataServiceType:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Lorem
+    responseGetServiceDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name: 
+          type: string 
+          example: service 1
+        type:
+          $ref: "#/components/schemas/detailDataServiceType"
+        description:
+          type: string
+          example: lorem ipsum
+        rating:
+          type: number
+          example: 4.5
+        address:
+          type: string 
+          example: Jl. something
+        phoneNumber:
+          type: string
+          example: 0271812312
+        createdAt:
+          type: string
+          format: date-time
+          example: 
+        updatedAt:
+          type: string
+          format: date-time
+          example: 
+        deletedAt:
+          type: string 
+          format: date-time
+          example:
+        reviews: 
+          type: array
+          items: 
+            $ref: "#/components/schemas/detailDataReviewWithDetailUser"
+    detailDataReviewWithDetailUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user:
+          $ref: "#/components/schemas/detailDataUser"
+        serviceId: 
+          type: integer
+          example: 1
+        rating: 
+          type: number
+          example: 4.5
+        description:
+          type: string
+          example: Lorem ipsum
+        createdAt: 
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt: 
+          type: string 
+          format: date-time
+    detailDataUser:
+      type: object
+      properties:
+        id: 
+          type: integer
+          example: 1
+        name:
+          type: string 
+          example: Lorem
+        email:
+          type: string 
+          format: email
+          example: user@mail.com
+    responseGetListReviewByUserId:
+      type: object
+      properties:
+        status: 
+          type: string 
+          example: Success
+        code: 
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Successfully get review by id
+        data: 
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            name: 
+              type: string 
+              example: Lorem
+            email: 
+              type: string 
+              format: email
+              example: user@mail.com
+            reviews:
+              type: array
+              items: 
+                $ref: "#/components/schemas/detailDataReviewWithDetailService"
+    detailDataReviewWithDetailService:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        service: 
+          $ref: "#/components/schemas/detailDataService"
+        rating: 
+          type: number
+          example: 4.5
+        description:
+          type: string
+          example: Lorem ipsum
+        createdAt: 
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt: 
+          type: string 
+          format: date-time
+    detailDataService:
+      type: object
+      properties:
+        id: 
+          type: integer
+          example: id
+        name: 
+          type: string 
+          example: service 1
+        rating:
+          type: number
+          example: 4.5
+        description:
+          type: string
+          example: Lorem Ipsum
+    requestBodyCreateService:
+      type: object
+      properties:
+        name: 
+          type: string 
+          example: service 1
+        typeId:
+          type: integer
+          example: 2
+        description:
+          type: string
+          example: lorem ipsum
+        rating:
+          type: number
+          example: 4.5
+        address:
+          type: string 
+          example: Jl. something
+        phoneNumber:
+          type: string
+          example: 0271812312
+    requestBodyCreateReview:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        serviceId:
+          type: integer
+          example: 1
+        rating: 
+          type: number
+          example: 4.5
+        description:
+          type: string
+          example: Lorem ipsum
+    responseSuccessLogin:
+      type: object
+      properties:
+        status: 
+          type: string 
+          example: Success
+        code: 
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Login success
+        data:
+          type: object
+          properties:
+            username:
+              type: string
+              example: user1
+            email: 
+              type: string 
+              example: user1@mail.com
+            token:
+              type: string 
+              format: hash
+              example: 
+            authorized:
+              type: boolean
+              example: true
+            role: 
+              type: string 
+              example: user
+    responseInternalServerError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Error
+        code: 
+          type: integer
+          example: 500
+        message:
+          type: string 
+          example: Internal server error
+        data:
+          type: object
+          additionalProperties: false
+    responseNotFoundError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Error
+        code: 
+          type: integer
+          example: 404
+        message:
+          type: string 
+          example: Not found
+        data:
+          type: object
+          additionalProperties: false
+    responseBadRequestError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Error
+        code: 
+          type: integer
+          example: 400
+        message:
+          type: string 
+          example: Bad request
+        data:
+          type: object
+          additionalProperties: false
+    responseUnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Error
+        code: 
+          type: integer
+          example: 401
+        message:
+          type: string 
+          example: Unauthorized
+        data:
+          type: object
+          additionalProperties: false
+    responseForbiddenError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Error
+        code: 
+          type: integer
+          example: 403
+        message:
+          type: string 
+          example: Forbidden
+        data:
+          type: object
+          additionalProperties: false
+
+paths:
+  /services:
+    get:
+      description: Get list services
+      tags:
+        - Service
+      parameters:
+        - name: page
+          required: false
+          in: query
+          schema:
+            type: integer
+            example: 1
+        - name: show
+          required: false
+          in: query
+          schema:
+            type: integer
+            example: 10
+        - name: sortBy
+          required: false
+          in: query
+          schema: 
+            type: string
+            example: rating
+        - name: sortingMethod
+          in: query
+          required: false
+          schema: 
+            type: string
+            example: desc
+        - name: keyword
+          in: query
+          required: false
+          schema: 
+            type: string
+            example: ''      
+      responses:
+        '200':
+          description: Successfully get data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Success
+                  code: 
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: ''
+                  data: 
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/responseGetListService"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseInternalServerError"
+    post:
+      description: Create service
+      tags:
+        - Service
+      security:
+        - authentication: []
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              $ref: "#/components/schemas/requestBodyCreateService"
+      responses:
+        '201':
+          description: Successfully create service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseCreate"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"
+  /services/:id:
+    put:
+      description: Update service by Id
+      tags:
+        - Service
+      security:
+        - authentication: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestBodyCreateService"
+      responses:
+        '200':
+          description: Successfully update service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseUpdate"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"
+        '401':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseUnauthorizedError"
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseNotFoundError"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"
+    get:
+      description: Get service by Id
+      tags:
+        - Service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Successfully get service by id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseGetServiceDetail"
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseNotFoundError"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"
+  /reviews:
+    post:
+      description: Create a review
+      tags:
+        - Review
+      security:
+        - authentication: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestBodyCreateReview"
+      responses:
+        '201':
+          description: Successfully create a review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseCreate"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseUnauthorizedError"
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseNotFoundError"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"
+  /reviews/:id:
+    put:
+      description: Update a review by id
+      tags:
+        - Review
+      security:
+        - authentication: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestBodyCreateReview"
+      responses:
+        '200':
+          description: Successfully create a review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseUpdate"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseUnauthorizedError"
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseNotFoundError"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"
+    delete:
+      description: Delete a review by id
+      tags:
+        - Review
+      security:
+        - authentication: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Successfully delete a review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseDelete"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseUnauthorizedError"
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseNotFoundError"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"      
+  /reviews/:userId:
+    get:
+      description: Get list review by userId
+      tags:
+        - Review
+      security:
+        - authentication: []
+      parameters:
+        - name: userId
+          in: path 
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: page
+          required: false
+          in: query
+          schema:
+            type: integer
+            example: 1
+        - name: show
+          required: false
+          in: query
+          schema:
+            type: integer
+            example: 10
+        - name: sortBy
+          required: false
+          in: query
+          schema: 
+            type: string
+            example: rating
+        - name: sortingMethod
+          in: query
+          required: false
+          schema: 
+            type: string
+            example: desc
+        - name: keyword
+          in: query
+          required: false
+          schema: 
+            type: string
+            example: ''
+      responses:
+        '200':
+          description: Successfully get list review by userId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseGetListReviewByUserId"
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseNotFoundError"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"
+  /login:
+    post:
+      description: user login
+      tags:
+      - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: user1
+                password:
+                  type: string
+                  example: YourPassword1#
+      responses:
+        '200':
+          description: Login success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseSuccessLogin"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseUnauthorizedError"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"
+  /register:
+    post:
+      description: user register
+      tags:
+      - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: user1
+                email:
+                  type: string
+                  example: user1@mail.com
+                password:
+                  type: string
+                  example: YourPassword1#
+      responses:
+        '201':
+          description: Register success
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/responseCreate"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responseBadRequestError"
