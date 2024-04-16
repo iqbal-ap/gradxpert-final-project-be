@@ -1,0 +1,27 @@
+{
+  "name": "gradxpert-final-project-be",
+  "version": "1.0.0",
+  "description": "GradXpert Final Project - Backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iqbal-ap/gradxpert-final-project-be.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iqbal-ap/gradxpert-final-project-be/issues"
+  },
+  "homepage": "https://github.com/iqbal-ap/gradxpert-final-project-be#readme",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jest": "^29.7.0",
+    "sequelize": "^6.37.3",
+    "sequelize-cli": "^6.6.2"
+  }
+}
