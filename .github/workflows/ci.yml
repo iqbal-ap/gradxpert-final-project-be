@@ -1,9 +1,9 @@
-name: CI
+name: CI Workflow
 
 on: [pull_request]
 
 jobs:
-  demo:
+  ci:
     runs-on: ubuntu-latest
 
     strategy:
