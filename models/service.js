@@ -2,52 +2,45 @@
 const {
   Model
 } = require('sequelize');
-const { IsEmail } = require('@sequelize/validator.js');
-
 module.exports = (sequelize, DataTypes) => {
-  class user extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+  class service extends Model {
     static associate(models) {
-      // define association here
-      user.belongsToMany(models.review)
+      service.belongsTo(models.service_type, {
+        foreignKey: 'service_type_id'
+      });
+      service.hasMany(models.review);
     }
   }
-  user.init({
+  service.init({
     id: {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
-      type: DataTypes.INTEGER,
+      type: Sequelize.INTEGER,
       unique: true,
     },
-    username: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: true,
-    },
-    password: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    email: {
-      type: DataTypes.STRING,
+    description: DataTypes.STRING,
+    rating: {
+      type: DataTypes.REAL,
       allowNull: false,
-      unique: true,
-      IsEmail,
     },
+    address: DataTypes.STRING,
     phoneNumber: {
       type: DataTypes.STRING,
-      allowNull: true,
       field: 'phone_number',
     },
-    role: {
-      type: DataTypes.ENUM('admin', 'user'),
+    serviceTypeId: {
+      type: DataTypes.INTEGER,
+      field: 'service_type_id',
+      references: {
+        model: 'service_types',
+        key: 'id',
+      },
       allowNull: false,
-      defaultValue: 'user',
     },
     createdAt: {
       allowNull: false,
@@ -66,8 +59,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     sequelize,
-    modelName: 'user',
+    modelName: 'service',
     underscored: true,
   });
-  return user;
+  return service;
 };

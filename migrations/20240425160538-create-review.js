@@ -1,40 +1,37 @@
 'use strict';
-const { IsEmail } = require('@sequelize/validator.js');
-
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('reviews', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+      service_id: {
         type: Sequelize.INTEGER,
-        unique: true,
-      },
-      username: {
-        type: Sequelize.STRING,
-        unique: true,
-        allowNull: true,
-      },
-      password: {
-        type: Sequelize.STRING,
         allowNull: false,
+        references: {
+          model: 'services',
+          key: 'id',
+        },
       },
-      email: {
-        type: Sequelize.STRING,
+      user_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        unique: true,
-        IsEmail,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
       },
-      phone_number: {
+      description: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      role: {
-        type: Sequelize.ENUM('admin', 'user'),
+      review: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: 'user',
       },
       created_at: {
         allowNull: false,
@@ -51,6 +48,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('reviews');
   }
 };

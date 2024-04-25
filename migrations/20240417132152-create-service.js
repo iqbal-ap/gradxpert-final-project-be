@@ -1,10 +1,11 @@
 'use strict';
-const { IsEmail } = require('@sequelize/validator.js');
+
+const tableName = 'services';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable(tableName, {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -12,45 +13,46 @@ module.exports = {
         type: Sequelize.INTEGER,
         unique: true,
       },
-      username: {
-        type: Sequelize.STRING,
-        unique: true,
-        allowNull: true,
-      },
-      password: {
+      name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      email: {
-        type: Sequelize.STRING,
+      description: {
+        type: Sequelize.STRING
+      },
+      rating: {
+        type: Sequelize.REAL,
         allowNull: false,
-        unique: true,
-        IsEmail,
+      },
+      address: {
+        type: Sequelize.STRING,
       },
       phone_number: {
         type: Sequelize.STRING,
-        allowNull: true,
       },
-      role: {
-        type: Sequelize.ENUM('admin', 'user'),
+      service_type_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'service_types',
+          key: 'id',
+        },
         allowNull: false,
-        defaultValue: 'user',
       },
       created_at: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updated_at: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       deleted_at: {
         allowNull: true,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       }
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable(tableName);
   }
 };

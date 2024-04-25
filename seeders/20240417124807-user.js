@@ -12,8 +12,8 @@ module.exports = {
         email: process.env.ADMIN_EMAIL_1,
         phone_number: process.env.ADMIN_PHONE_NUMBER_1,
         role: 'admin',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       {
         username: process.env.ADMIN_USERNAME_2,
@@ -21,8 +21,8 @@ module.exports = {
         email: process.env.ADMIN_EMAIL_2,
         phone_number: process.env.ADMIN_PHONE_NUMBER_2,
         role: 'admin',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
       }
     ])
   },
