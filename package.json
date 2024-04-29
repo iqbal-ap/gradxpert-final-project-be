@@ -18,9 +18,11 @@
   },
   "homepage": "https://github.com/iqbal-ap/gradxpert-final-project-be#readme",
   "dependencies": {
+    "@sequelize/validator.js": "^7.0.0-alpha.40",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jest": "^29.7.0",
+    "pg": "^8.11.5",
     "sequelize": "^6.37.3",
     "sequelize-cli": "^6.6.2"
   }
