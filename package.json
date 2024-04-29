@@ -4,7 +4,7 @@
   "description": "GradXpert Final Project - Backend",
   "main": "index.js",
   "scripts": {
-    "test": "jest --config=./config/jest.config.js --passWithNoTests"
+    "test": "jest --config=./config/jest.config.js"
   },
   "repository": {
     "type": "git",
