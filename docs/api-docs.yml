@@ -299,6 +299,9 @@ components:
         data:
           type: object
           properties:
+            id:
+              type: integer
+              example: 1
             username:
               type: string
               example: user1
@@ -309,9 +312,6 @@ components:
               type: string 
               format: hash
               example: 
-            authorized:
-              type: boolean
-              example: true
             role: 
               type: string 
               example: user
@@ -776,6 +776,9 @@ paths:
             schema:
               type: object
               properties:
+                username:
+                  type: string
+                  example: yourUsername
                 email:
                   type: string
                   example: user1

@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       review.belongsTo(models.service, {
         foreignKey: 'service_id'
       });
-      review.belongsToMany(models.user, {
+      review.belongsTo(models.user, {
         foreignKey: 'user_id'
       });
     }
@@ -48,8 +48,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    review: {
-      type: DataTypes.INTEGER,
+    rating: {
+      type: DataTypes.REAL,
       allowNull: false,
     },
     createdAt: {
@@ -60,12 +60,12 @@ module.exports = (sequelize, DataTypes) => {
     updatedAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      field: 'created_at'
+      field: 'updated_at'
     },
     deletedAt: {
       allowNull: true,
       type: DataTypes.DATE,
-      field: 'created_at'
+      field: 'deleted_at'
     },
   }, {
     sequelize,
