@@ -3,7 +3,7 @@ const router = express.Router();
 const { AuthMiddleware, ServiceMiddleware, ReviewMiddleware } = require('../middlewares/index');
 const { AuthController, ServiceController, ReviewController } = require('../controllers/index')
 
-//  * User Feature
+//  * Auth Feature
 router.post(
   '/login',
   AuthMiddleware.validateLoginParams,
@@ -30,21 +30,28 @@ router.get(
 // * Review Feature
 router.post(
   '/reviews',
-  ReviewMiddleware.validateCreateReviewParams,
   AuthMiddleware.validateUserToken,
+  ReviewMiddleware.validateCreateReviewParams,
   ReviewController.createReview,
 );
 router.put(
   '/reviews/:id',
-  ReviewMiddleware.validateUpdateReviewParams,
   AuthMiddleware.validateUserToken,
+  ReviewMiddleware.validateUpdateReviewParams,
   ReviewController.updateReview,
 )
 router.delete(
   '/reviews/:id',
-  ReviewMiddleware.validateDeleteReviewParams,
   AuthMiddleware.validateUserToken,
+  ReviewMiddleware.validateDeleteReviewParams,
   ReviewController.deleteReview,
 )
 
+// * User Feature
+router.get(
+  'user/:id/reviews',
+  AuthMiddleware.validateUserToken,
+  // TODO: Add UserMiddleware.validateGetReviewHistoryParams
+  // TODO: Add UserController.getReviewHistory
+)
 module.exports = router;

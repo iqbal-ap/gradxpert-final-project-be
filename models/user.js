@@ -2,7 +2,6 @@
 const {
   Model
 } = require('sequelize');
-const { IsEmail } = require('@sequelize/validator.js');
 
 module.exports = (sequelize, DataTypes) => {
   class user extends Model {
@@ -37,7 +36,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-      IsEmail,
+      validate: {
+        isEmail: true,
+      }
     },
     phoneNumber: {
       type: DataTypes.STRING,
