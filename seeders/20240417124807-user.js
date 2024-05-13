@@ -1,6 +1,7 @@
 'use strict';
 
 require('dotenv').config();
+const bycrpt = require('bcrypt');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -8,7 +9,7 @@ module.exports = {
     return await queryInterface.bulkInsert('users', [
       {
         username: process.env.ADMIN_USERNAME_1,
-        password: process.env.ADMIN_PASSWORD_1,
+        password: await bycrpt.hash(process.env.ADMIN_PASSWORD_1, Number(process.env.SALT)),
         email: process.env.ADMIN_EMAIL_1,
         phone_number: process.env.ADMIN_PHONE_NUMBER_1,
         role: 'admin',
@@ -17,7 +18,7 @@ module.exports = {
       },
       {
         username: process.env.ADMIN_USERNAME_2,
-        password: process.env.ADMIN_PASSWORD_2,
+        password: await bycrpt.hash(process.env.ADMIN_PASSWORD_2, Number(process.env.SALT)),
         email: process.env.ADMIN_EMAIL_2,
         phone_number: process.env.ADMIN_PHONE_NUMBER_2,
         role: 'admin',

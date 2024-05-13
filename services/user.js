@@ -46,11 +46,17 @@ module.exports = {
   getListUser: async (username, email, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc') => {
     try {
       const users = await models.user.findAll({
-        where: models.Sequelize.Op.or({
-          username,
-          email,
-          deletedAt: null,
-        }),
+        where: {
+          [models.Sequelize.Op.and] : [
+            { deletedAt: null },
+            {
+              [models.Sequelize.Op.or]: [
+                { username },
+                { email },
+              ]
+            }
+          ],
+        },
         limit,
         offset,
         order: [[sortBy, sortingMethod]],

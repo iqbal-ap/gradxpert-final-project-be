@@ -42,8 +42,10 @@ module.exports = {
           {
             model: models.review,
             where: { deletedAt: null },
+            required: false,
             include: [{
               model: models.user,
+              required: false,
               attributes: ['id', 'username', 'email'],
               where: { deletedAt: null }
             }],

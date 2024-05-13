@@ -17,11 +17,25 @@ module.exports = {
       throw ERROR.INTERNAL_SERVER_ERROR;
     }
   },
+  getReviewByServiceId: async (service_id) => {
+    try {
+      const review = await models.review.findOne({
+        where: {
+          service_id,
+          deletedAt: null,
+        }
+      })
+      return review;
+    } catch (error) {
+      console.log(error);
+      throw ERROR.INTERNAL_SERVER_ERROR;
+    }
+  },
   getTotalRatingByServiceId: async (serviceId) => {
     try {
       const data = await models.DbConnection.query(`
       SELECT
-	      SUM(rating)::real as total,
+	      COALESCE(SUM(rating), 0)::real as total,
 	      COUNT(rating)::integer as "numOfReview"
       FROM reviews r
       WHERE 
@@ -72,6 +86,9 @@ module.exports = {
         throw ERROR.SERVICE_NOT_FOUND;
       }
 
+      // * Check if first review or not
+      const existingReview = await module.exports.getReviewByServiceId(serviceId);
+
       // * Create review
       const review = await models.review.create({
         userId,
@@ -85,8 +102,11 @@ module.exports = {
       );
 
       // * Update related service's rating
-      const { total, numOfReview } = await module.exports.getTotalRatingByServiceId(serviceId);
-      const newRating = (total + rating) / (numOfReview + 1);
+      let newRating = rating;
+      if (existingReview) {
+        const { total, numOfReview } = await module.exports.getTotalRatingByServiceId(serviceId);
+        newRating = (total + rating) / (numOfReview + 1);
+      }
       await ServiceServices.updateServiceById(
         serviceId,
         service.name,

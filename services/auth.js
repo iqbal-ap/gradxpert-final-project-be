@@ -13,8 +13,7 @@ module.exports = {
       }
 
       // Encrypt Password
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const isMatch = await bcrypt.compare(password, hashedPassword);
+      const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         throw ERROR.INVALID_USERNAME_PASSWORD;
       }
@@ -59,7 +58,7 @@ module.exports = {
       }
 
       // Encrypt Password
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, Number(process.env.SALT));
       
       // Create user
       const user = await UserServices.createUser(username, email, hashedPassword, phoneNumber);

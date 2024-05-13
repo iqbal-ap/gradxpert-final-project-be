@@ -5,6 +5,6 @@ const { DbConnection } = require('./models/index');
 const port = process.env.PORT;
 
 app.listen(port, async () => {
-  authenticateDb(DbConnection);
+  await authenticateDb(DbConnection);
   console.log(`App listening on port ${port}`);
 });

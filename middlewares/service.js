@@ -8,10 +8,12 @@ module.exports = {
       page: joi
         .number()
         .integer()
+        .min(1)
         .default(1),
       show: joi
         .number()
         .integer()
+        .min(1)
         .default(10),
       sortBy: joi
         .string()
@@ -41,6 +43,7 @@ module.exports = {
       id: joi
         .number()
         .integer()
+        .min(1)
         .required(),
     });
     const validationResult = validationSchema.validate(req.params);

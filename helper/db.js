@@ -1,6 +1,6 @@
-function authenticateDb(sequelize) {
+async function authenticateDb(sequelize) {
   try {
-    sequelize.authenticate()
+    await sequelize.authenticate()
     console.log('Successfully connect to database!');
   } catch (error) {
     console.log('Failed to connect to database!');
