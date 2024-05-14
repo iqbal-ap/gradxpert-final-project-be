@@ -1,4 +1,4 @@
-const models = require('../models/index');
+const { ServiceRepository } = require('../repositories/index');
 const ERROR = require('../helper/error')
 
 module.exports = {
@@ -9,84 +9,26 @@ module.exports = {
         whereClauses.push({ name: { [models.Sequelize.Op.iLike]: `%${keyword}%` } })
       }
 
-      const services = await models.service.findAll({
-        where: models.Sequelize.and(whereClauses),
-        limit,
-        offset,
-        order: [[sortBy, sortingMethod]],
-        include: [{
-          model: models.serviceType,
-          attributes: ['id', 'name'],
-          where: { deletedAt: null },
-        }]
-      });
+      const services = await ServiceRepository.getListServices(limit, offset, sortBy, sortingMethod, keyword, whereClauses);
       return services;
     } catch (error) {
-      console.log(error)
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      throw error;
     }
   },
   getServiceById: async (id) => {
     try {
-      const service = await models.service.findOne({
-        where: {
-          id,
-          deletedAt: null,
-        },
-        include: [
-          {
-            model: models.serviceType,
-            attributes: ['id', 'name'],
-            where: { deletedAt: null },
-          },
-          {
-            model: models.review,
-            where: { deletedAt: null },
-            required: false,
-            include: [{
-              model: models.user,
-              required: false,
-              attributes: ['id', 'username', 'email'],
-              where: { deletedAt: null }
-            }],
-          },
-        ],
-      });
-      if (!service) {
-        throw ERROR.SERVICE_NOT_FOUND;
-      }
-
+      const service = await ServiceRepository.getServiceById(id);
       return service;
     } catch (error) {
-      console.log(error)
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      throw error;
     }
   },
   updateServiceById: async (id, name, description, rating, address, phoneNumber, serviceTypeId, transaction) => {
     try {
-      const service = await models.service.update(
-        {
-          name, 
-          description,
-          rating,
-          address,
-          phoneNumber,
-          serviceTypeId,
-          updatedAt: new Date(),
-        },
-        { 
-          where: {
-            id,
-            deletedAt: null,
-          },
-          transaction
-        },
-      );
+      const service = await ServiceRepository.updateServiceById(id, name, description, rating, address, phoneNumber, serviceTypeId, transaction);
       return service;
     } catch (error) {
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
-      
+      throw error;
     }
   }
 }

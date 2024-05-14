@@ -1,26 +1,13 @@
-const models = require('../models/index');
+const { UserRepository } = require('../repositories/index');
 const ERROR = require('../helper/error');
 
 module.exports = {
   createUser: async (username, email, password, phoneNumber, role) => {
-    const transaction = await models.DbConnection.transaction({});
     try {
-      const user = await models.user.create({
-        username,
-        password,
-        email,
-        phoneNumber,
-        role: role,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-        { transaction },
-      )
-      await transaction.commit()
+      const user = await UserRepository.createUser(username, email, password, phoneNumber, role);
       return user;
     } catch (error) {
-      console.log(error)
-      await transaction.rollback()
+      throw error
     }
   },
   getUser: async (username, email) => {
@@ -34,37 +21,18 @@ module.exports = {
         filterObj.username = username;
       }
       
-      const user = await models.user.findOne({
-        where: filterObj,
-      });
+      const user = await UserRepository.getUser(filterObj);
       return user;
     } catch (error) {
-      console.log(error)
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      throw error;
     }
   },
   getListUser: async (username, email, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc') => {
     try {
-      const users = await models.user.findAll({
-        where: {
-          [models.Sequelize.Op.and] : [
-            { deletedAt: null },
-            {
-              [models.Sequelize.Op.or]: [
-                { username },
-                { email },
-              ]
-            }
-          ],
-        },
-        limit,
-        offset,
-        order: [[sortBy, sortingMethod]],
-      })
+      const users = await UserRepository.getListUser(username, email, limit, offset, sortBy, sortingMethod);
       return users;
     } catch (error) {
-      console.log(error)
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      throw error;
     }
   }
 }

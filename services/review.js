@@ -1,80 +1,39 @@
 const models = require('../models/index');
+const { ReviewRepository } = require('../repositories/index');
 const ERROR = require('../helper/error');
 const ServiceServices = require('./service');
 
 module.exports = {
   getReviewById: async (id) => {
     try {
-      const review = await models.review.findOne({
-        where: {
-          id,
-          deletedAt: null,
-        }
-      })
+      const review = await ReviewRepository.getReviewById(id);
       return review;
     } catch (error) {
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      throw error;
     }
   },
   getReviewByServiceId: async (serviceId) => {
     try {
-      const review = await models.review.findOne({
-        where: {
-          serviceId,
-          deletedAt: null,
-        }
-      })
+      const review = await ReviewRepository.getReviewByServiceId(serviceId);
       return review;
     } catch (error) {
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      throw error;
     }
   },
   getTotalRatingByServiceId: async (serviceId) => {
     try {
-      const data = await models.DbConnection.query(`
-      SELECT
-	      COALESCE(SUM(rating), 0)::real as total,
-	      COUNT(rating)::integer as "numOfReview"
-      FROM reviews r
-      WHERE 
-        r."serviceId" = :serviceId
-        and r."deletedAt" is null
-      GROUP BY rating;
-      `,
-      {
-        replacements: { serviceId },
-        type: models.Sequelize.QueryTypes.SELECT,
-        raw: true,
-      })
-      return data[0];
+      const data = await ReviewRepository.getTotalRatingByServiceId(serviceId);
+      return data;
     } catch (error) {
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      throw error;
     }
   },
   getTotalRatingByServiceIdExcludeOne: async (serviceId, reviewId) => {
     try {
-      const data = await models.DbConnection.query(`
-      SELECT
-	      SUM(rating)::real as total,
-	      COUNT(rating)::integer as "numOfReview"
-      FROM reviews r
-      WHERE 
-        r."serviceId" = :serviceId
-        and r.id != :reviewId
-        and r."deletedAt" is null;
-      `,
-      {
-        replacements: { serviceId, reviewId },
-        type: models.Sequelize.QueryTypes.SELECT,
-        raw: true,
-      })
-      return data[0];
+      const data = await ReviewRepository.getTotalRatingByServiceIdExcludeOne(serviceId, reviewId);
+      return data;
     } catch (error) {
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      throw error;
     }
   },
   createReview: async (userId, serviceId, rating, description = null) => {
@@ -87,24 +46,15 @@ module.exports = {
       }
 
       // * Check if first review or not
-      const existingReview = await module.exports.getReviewByServiceId(serviceId);
+      const existingReview = await ReviewRepository.getReviewByServiceId(serviceId);
 
       // * Create review
-      const review = await models.review.create({
-        userId,
-        serviceId,
-        rating,
-        description,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-        { transaction },
-      );
+      const review = await ReviewRepository.createReview(userId, serviceId, rating, description, transaction)
 
       // * Update related service's rating
       let newRating = rating;
       if (existingReview) {
-        const { total, numOfReview } = await module.exports.getTotalRatingByServiceId(serviceId);
+        const { total, numOfReview } = await ReviewRepository.getTotalRatingByServiceId(serviceId);
         newRating = (total + rating) / (numOfReview + 1);
       }
       await ServiceServices.updateServiceById(
@@ -123,14 +73,14 @@ module.exports = {
     } catch (error) {
       await transaction.rollback();
       console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      throw error;
     }
   },
   updateReview: async (reviewId, userId, serviceId, rating, description = null) => {
     const transaction = await models.DbConnection.transaction({});
     try {
       // * Check whether review exists
-      const review = await module.exports.getReviewById(reviewId);
+      const review = await ReviewRepository.getReviewById(reviewId);
       if (!review) {
         throw ERROR.REVIEW_NOT_FOUND;
       }
@@ -141,27 +91,11 @@ module.exports = {
         throw ERROR.SERVICE_NOT_FOUND;
       }
 
-      // * Create review
-      const newReview = await models.review.update(
-        {
-          userId,
-          serviceId,
-          rating,
-          description,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          where: {
-            id: reviewId,
-            deletedAt: null,
-          },
-          transaction
-        },
-      );
+      // * Update review
+      const newReview = await ReviewRepository.updateReview(userId, rating, description, transaction);
 
       // * Update related service's rating
-      const { total, numOfReview } = await module.exports.getTotalRatingByServiceIdExcludeOne(serviceId, reviewId);
+      const { total, numOfReview } = await ReviewRepository.getTotalRatingByServiceIdExcludeOne(serviceId, reviewId);
       const newRating = (total + rating) / (numOfReview + 1);
 
       await ServiceServices.updateServiceById(
@@ -179,15 +113,14 @@ module.exports = {
       return newReview;
     } catch (error) {
       await transaction.rollback();
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      throw error;
     }
   },
   deleteReview: async (reviewId) => {
     const transaction = await models.DbConnection.transaction({});
     try {
       // * Check whether review exists
-      const review = await module.exports.getReviewById(reviewId);
+      const review = await ReviewRepository.getReviewById(reviewId);
       if (!review) {
         throw ERROR.REVIEW_NOT_FOUND;
       }
@@ -197,8 +130,8 @@ module.exports = {
       if (!service) {
         throw ERROR.SERVICE_NOT_FOUND;
       }
-      const { total, numOfReview } = await module.exports.getTotalRatingByServiceIdExcludeOne(review.serviceId, reviewId);
-      const newRating = total / numOfReview;
+      const { total, numOfReview } = await ReviewRepository.getTotalRatingByServiceIdExcludeOne(review.serviceId, reviewId);
+      const newRating = numOfReview ? total / numOfReview : 0;
       await ServiceServices.updateServiceById(
         review.serviceId,
         service.name,
@@ -211,23 +144,14 @@ module.exports = {
       );
 
       // * Delete review
-      const newReview = await models.review.update(
-        { deletedAt: new Date() },
-        {
-          where: {
-            id: reviewId,
-            deletedAt: null,
-          },
-          transaction
-        },
-      );
+      const newReview = await ReviewRepository.deleteReview(reviewId, transaction);
 
       await transaction.commit();
       return newReview;
     } catch (error) {
       await transaction.rollback();
       console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      throw error;
     }
   },
 }
