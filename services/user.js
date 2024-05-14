@@ -1,5 +1,6 @@
 const { UserRepository } = require('../repositories/index');
 const ERROR = require('../helper/error');
+const models = require('../models');
 
 module.exports = {
   createUser: async (username, email, password, phoneNumber, role) => {
@@ -34,5 +35,20 @@ module.exports = {
     } catch (error) {
       throw error;
     }
-  }
+  },
+  getReviewHistoryByUserId: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '') => {
+    try {
+      const whereClauses = [{ deletedAt: null }];
+      if (keyword) {
+        whereClauses.push({
+          [models.Sequelize.Op.or]: [{ description: { [models.Sequelize.Op.iLike]: `%${keyword}%` } }]
+        })
+      }
+
+      const data = await UserRepository.getReviewHistoryByUserId(id, limit, offset, sortBy, sortingMethod, whereClauses);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  },
 }

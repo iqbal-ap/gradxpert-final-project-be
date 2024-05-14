@@ -2,7 +2,7 @@ const models = require('../models/index');
 const ERROR = require('../helper/error')
 
 module.exports = {
-  getListServices: async (limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '', whereClauses = [{ deletedAt: null }]) => {
+  getListServices: async (limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', whereClauses = [{ deletedAt: null }]) => {
     try {
       const services = await models.service.findAll({
         where: models.Sequelize.and(whereClauses),

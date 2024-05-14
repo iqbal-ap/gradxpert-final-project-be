@@ -57,5 +57,37 @@ module.exports = {
       console.log(error)
       throw ERROR.INTERNAL_SERVER_ERROR;
     }
+  },
+  getReviewHistoryByUserId: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', whereClauses = [{ deletedAt: null }]) => {
+    try {
+      const data = models.user.findOne({
+        attributes: ['id', 'username', 'email'],
+        where: {
+          id,
+          deletedAt: null,
+        },
+        include: [
+          {
+            model: models.review,
+            where: { [models.Sequelize.Op.and]: whereClauses },
+            limit,
+            offset,
+            order: [[sortBy, sortingMethod]],
+            required: false,
+            include: [
+              {
+                model: models.service,
+                attributes: ['id', 'name', 'rating', 'description'],
+                where: { deletedAt: null },
+              }
+            ]
+          }          
+        ],
+      })
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw ERROR.INTERNAL_SERVER_ERROR;
+    }
   }
 }

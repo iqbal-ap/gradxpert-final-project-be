@@ -702,7 +702,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/responseBadRequestError"      
-  /user/:id/reviews:
+  /users/:id/reviews:
     get:
       description: Get list review by userId
       tags:
@@ -710,7 +710,7 @@ paths:
       security:
         - authentication: []
       parameters:
-        - name: userId
+        - name: id
           in: path 
           required: true
           schema:

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { AuthMiddleware, ServiceMiddleware, ReviewMiddleware } = require('../middlewares/index');
-const { AuthController, ServiceController, ReviewController } = require('../controllers/index')
+const { AuthMiddleware, ServiceMiddleware, ReviewMiddleware, UserMiddleware } = require('../middlewares/index');
+const { AuthController, ServiceController, ReviewController, UserController } = require('../controllers/index');
 
 //  * Auth Feature
 router.post(
@@ -49,9 +49,9 @@ router.delete(
 
 // * User Feature
 router.get(
-  'user/:id/reviews',
+  '/users/:id/reviews',
   AuthMiddleware.validateUserToken,
-  // TODO: Add UserMiddleware.validateGetReviewHistoryParams
-  // TODO: Add UserController.getReviewHistory
+  UserMiddleware.validateGetReviewHistoryParams,
+  UserController.getReviewHistoryByUserId
 )
 module.exports = router;
