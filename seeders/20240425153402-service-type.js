@@ -1,7 +1,7 @@
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
-const tableName = 'service_types'
+const tableName = 'serviceTypes'
 module.exports = {
   async up (queryInterface, Sequelize) {
     /**
@@ -16,18 +16,18 @@ module.exports = {
    await queryInterface.bulkInsert(tableName, [
      {
        name: 'Service Type 1',
-       created_at: new Date(),
-       updated_at: new Date(),
+       createdAt: new Date(),
+       updatedAt: new Date(),
      },
      {
        name: 'Service Type 2',
-       created_at: new Date(),
-       updated_at: new Date(),
+       createdAt: new Date(),
+       updatedAt: new Date(),
      },
      {
        name: 'Service Type 3',
-       created_at: new Date(),
-       updated_at: new Date(),
+       createdAt: new Date(),
+       updatedAt: new Date(),
      },
   ])
   },

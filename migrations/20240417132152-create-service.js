@@ -27,26 +27,26 @@ module.exports = {
       address: {
         type: Sequelize.STRING,
       },
-      phone_number: {
+      phoneNumber: {
         type: Sequelize.STRING,
       },
-      service_type_id: {
+      serviceTypeId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'service_types',
+          model: 'serviceTypes',
           key: 'id',
         },
         allowNull: false,
       },
-      created_at: {
+      createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      updated_at: {
+      updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      deleted_at: {
+      deletedAt: {
         allowNull: true,
         type: Sequelize.DATE,
       }

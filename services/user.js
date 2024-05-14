@@ -9,10 +9,10 @@ module.exports = {
         username,
         password,
         email,
-        phone_number: phoneNumber,
+        phoneNumber,
         role: role,
-        created_at: new Date(),
-        updated_at: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
         { transaction },
       )

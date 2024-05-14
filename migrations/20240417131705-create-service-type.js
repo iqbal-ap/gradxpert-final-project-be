@@ -1,6 +1,6 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
-const tableName = 'service_types';
+const tableName = 'serviceTypes';
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable(tableName, {
@@ -16,15 +16,15 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      created_at: {
+      createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      updated_at: {
+      updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      deleted_at: {
+      deletedAt: {
         allowNull: true,
         type: Sequelize.DATE
       },

@@ -3,12 +3,12 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class service_type extends Model {
+  class serviceType extends Model {
     static associate(models) {
-      service_type.hasMany(models.service);
+      serviceType.hasMany(models.service);
     }
   }
-  service_type.init({
+  serviceType.init({
     id: {
       allowNull: false,
       autoIncrement: true,
@@ -24,23 +24,19 @@ module.exports = (sequelize, DataTypes) => {
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      field: 'created_at'
     },
     updatedAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      field: 'updated_at'
     },
     deletedAt: {
       allowNull: true,
       type: DataTypes.DATE,
-      field: 'deleted_at'
     }
   }, {
     sequelize,
-    modelName: 'service_type',
-    underscored: true,
+    modelName: 'serviceType',
   });
 
-  return service_type;
+  return serviceType;
 };

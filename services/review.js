@@ -17,11 +17,11 @@ module.exports = {
       throw ERROR.INTERNAL_SERVER_ERROR;
     }
   },
-  getReviewByServiceId: async (service_id) => {
+  getReviewByServiceId: async (serviceId) => {
     try {
       const review = await models.review.findOne({
         where: {
-          service_id,
+          serviceId,
           deletedAt: null,
         }
       })
@@ -39,8 +39,8 @@ module.exports = {
 	      COUNT(rating)::integer as "numOfReview"
       FROM reviews r
       WHERE 
-        r.service_id = :serviceId
-        and r.deleted_at is null
+        r."serviceId" = :serviceId
+        and r."deletedAt" is null
       GROUP BY rating;
       `,
       {
@@ -62,9 +62,9 @@ module.exports = {
 	      COUNT(rating)::integer as "numOfReview"
       FROM reviews r
       WHERE 
-        r.service_id = :serviceId
+        r."serviceId" = :serviceId
         and r.id != :reviewId
-        and r.deleted_at is null;
+        and r."deletedAt" is null;
       `,
       {
         replacements: { serviceId, reviewId },
@@ -197,7 +197,7 @@ module.exports = {
       if (!service) {
         throw ERROR.SERVICE_NOT_FOUND;
       }
-      const { total, numOfReview } = await module.exports.getTotalRatingByServiceIdExcludeOne(review.service_id, reviewId);
+      const { total, numOfReview } = await module.exports.getTotalRatingByServiceIdExcludeOne(review.serviceId, reviewId);
       const newRating = total / numOfReview;
       await ServiceServices.updateServiceById(
         review.serviceId,

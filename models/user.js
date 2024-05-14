@@ -43,7 +43,6 @@ module.exports = (sequelize, DataTypes) => {
     phoneNumber: {
       type: DataTypes.STRING,
       allowNull: true,
-      field: 'phone_number',
     },
     role: {
       type: DataTypes.ENUM('admin', 'user'),
@@ -53,22 +52,18 @@ module.exports = (sequelize, DataTypes) => {
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      field: 'created_at',
     },
     updatedAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      field: 'updated_at',
     },
     deletedAt: {
       allowNull: true,
       type: DataTypes.DATE,
-      field: 'deleted_at',
     }
   }, {
     sequelize,
     modelName: 'user',
-    underscored: true,
   });
   return user;
 };

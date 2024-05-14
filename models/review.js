@@ -12,10 +12,10 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       review.belongsTo(models.service, {
-        foreignKey: 'service_id'
+        foreignKey: 'serviceId'
       });
       review.belongsTo(models.user, {
-        foreignKey: 'user_id'
+        foreignKey: 'userId'
       });
     }
   }
@@ -29,7 +29,6 @@ module.exports = (sequelize, DataTypes) => {
     serviceId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      field: 'service_id',
       references: {
         model: 'services',
         key: 'id',
@@ -38,7 +37,6 @@ module.exports = (sequelize, DataTypes) => {
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      field: 'user_id',
       references: {
         model: 'users',
         key: 'id',
@@ -59,22 +57,18 @@ module.exports = (sequelize, DataTypes) => {
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      field: 'created_at',
     },
     updatedAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      field: 'updated_at'
     },
     deletedAt: {
       allowNull: true,
       type: DataTypes.DATE,
-      field: 'deleted_at'
     },
   }, {
     sequelize,
     modelName: 'review',
-    underscored: true,
   });
   return review;
 };

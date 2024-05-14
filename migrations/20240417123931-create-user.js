@@ -27,7 +27,7 @@ module.exports = {
         unique: true,
         IsEmail,
       },
-      phone_number: {
+      phoneNumber: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -36,15 +36,15 @@ module.exports = {
         allowNull: false,
         defaultValue: 'user',
       },
-      created_at: {
+      createdAt: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updated_at: {
+      updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      deleted_at: {
+      deletedAt: {
         allowNull: true,
         type: Sequelize.DATE
       }

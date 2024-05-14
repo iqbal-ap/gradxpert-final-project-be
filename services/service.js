@@ -4,7 +4,7 @@ const ERROR = require('../helper/error')
 module.exports = {
   getListServices: async (limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '') => {
     try {
-      const whereClauses = [{ deleted_at: null }];
+      const whereClauses = [{ deletedAt: null }];
       if (keyword) {
         whereClauses.push({ name: { [models.Sequelize.Op.iLike]: `%${keyword}%` } })
       }
@@ -15,7 +15,7 @@ module.exports = {
         offset,
         order: [[sortBy, sortingMethod]],
         include: [{
-          model: models.service_type,
+          model: models.serviceType,
           attributes: ['id', 'name'],
           where: { deletedAt: null },
         }]
@@ -35,7 +35,7 @@ module.exports = {
         },
         include: [
           {
-            model: models.service_type,
+            model: models.serviceType,
             attributes: ['id', 'name'],
             where: { deletedAt: null },
           },
@@ -70,9 +70,9 @@ module.exports = {
           description,
           rating,
           address,
-          phone_number: phoneNumber,
-          service_type_id: serviceTypeId,
-          updated_at: new Date(),
+          phoneNumber,
+          serviceTypeId,
+          updatedAt: new Date(),
         },
         { 
           where: {
