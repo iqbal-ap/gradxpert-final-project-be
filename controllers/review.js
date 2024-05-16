@@ -24,7 +24,7 @@ module.exports = {
       responseSuccess(res, {
         code: STATUS_CODES.OK,
         message: 'Successfully update data',
-        data: {},
+        data,
       })
     } catch (error) {
       responseError(res, error);

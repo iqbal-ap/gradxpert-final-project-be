@@ -5,7 +5,7 @@ module.exports = {
   getListServices: async (limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', whereClauses = [{ deletedAt: null }]) => {
     try {
       const services = await models.service.findAll({
-        where: models.Sequelize.and(whereClauses),
+        where: { [models.Sequelize.Op.and]: whereClauses },
         limit,
         offset,
         order: [[sortBy, sortingMethod]],
@@ -13,7 +13,7 @@ module.exports = {
           model: models.serviceType,
           attributes: ['id', 'name'],
           where: { deletedAt: null },
-        }]
+        }],
       });
       return services;
     } catch (error) {

@@ -102,7 +102,7 @@ module.exports = {
       throw ERROR.INTERNAL_SERVER_ERROR;
     }
   },
-  updateReview: async (userId, rating, description = null, trx) => {
+  updateReview: async (reviewId, userId, serviceId, rating, description = null, trx) => {
     const transaction = trx ? trx : await models.DbConnection.transaction({});
     try {
       const newReview = await models.review.update(

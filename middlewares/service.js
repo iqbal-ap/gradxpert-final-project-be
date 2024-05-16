@@ -17,7 +17,7 @@ module.exports = {
         .default(10),
       sortBy: joi
         .string()
-        .valid('id', 'created_at', 'updated_at', 'rating')
+        .valid('id', 'createdAt', 'updatedAt', 'rating', 'name')
         .default('id'),
       sortingMethod: joi
         .string()

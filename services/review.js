@@ -92,7 +92,7 @@ module.exports = {
       }
 
       // * Update review
-      const newReview = await ReviewRepository.updateReview(userId, rating, description, transaction);
+      await ReviewRepository.updateReview(reviewId, userId, serviceId, rating, description, transaction);
 
       // * Update related service's rating
       const { total, numOfReview } = await ReviewRepository.getTotalRatingByServiceIdExcludeOne(serviceId, reviewId);
@@ -109,6 +109,8 @@ module.exports = {
         transaction,
       );
 
+      // * Get new review
+      const newReview = await ReviewRepository.getReviewById(reviewId);
       await transaction.commit();
       return newReview;
     } catch (error) {

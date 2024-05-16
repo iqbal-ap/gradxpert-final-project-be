@@ -1,5 +1,6 @@
+const models = require('../models/index');
 const { ServiceRepository } = require('../repositories/index');
-const ERROR = require('../helper/error')
+const ERROR = require('../helper/error');
 
 module.exports = {
   getListServices: async (limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '') => {
@@ -8,8 +9,7 @@ module.exports = {
       if (keyword) {
         whereClauses.push({ name: { [models.Sequelize.Op.iLike]: `%${keyword}%` } })
       }
-
-      const services = await ServiceRepository.getListServices(limit, offset, sortBy, sortingMethod, keyword, whereClauses);
+      const services = await ServiceRepository.getListServices(limit, offset, sortBy, sortingMethod, whereClauses);
       return services;
     } catch (error) {
       throw error;
@@ -18,6 +18,10 @@ module.exports = {
   getServiceById: async (id) => {
     try {
       const service = await ServiceRepository.getServiceById(id);
+      if (!service) {
+        throw ERROR.SERVICE_NOT_FOUND;
+      }
+
       return service;
     } catch (error) {
       throw error;
