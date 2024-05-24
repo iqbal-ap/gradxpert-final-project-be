@@ -5,9 +5,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { Root, ApiV1 } = require('./routes/index');
 const app = express();
+const cors = require('cors');
 const jsonParser = bodyParser.json();
 const urlEncodedParser = bodyParser.urlencoded({ extended: false });
 
+app.use(cors())
 app.use(jsonParser);
 app.use(urlEncodedParser);
 
