@@ -6,17 +6,20 @@ const models  = require('../models/index');
 const { generateRandomPayloads } = require('../helper/testUtil');
 
 const tokenAdmin = process.env.ADMIN_TOKEN_1;
+const Authorization = `Bearer ${tokenAdmin}`;
+const validHeader = {
+  Authorization,
+  'Content-Type': 'application/json',
+};
+const invalidHeader = {
+  'Content-Type': 'application/json',
+};
 const createdReviewIds = [];
 const userIdsWithReviews = [];
 
 beforeAll(async () => {
   await authenticateDb(models.DbConnection);
 });
-
-afterAll(() => {
-  console.log('createdReviewIds:', createdReviewIds);
-  console.log('userIdsWithReviews:', userIdsWithReviews);
-})
 
 describe('GET /', () => {
   test('should respond with a 200 status code', async () => {
@@ -235,6 +238,28 @@ describe('POST /api/v1/register', () => {
       }
     })
   });
+
+  describe('given already exists user data', () => {
+    test('should respond with a 400 status code & empty object data', async () => {
+      const payloads = [
+        {
+          username: process.env.ADMIN_USERNAME_1,
+          password: process.env.ADMIN_PASSWORD_1,
+          email: process.env.ADMIN_EMAIL_1,
+        },
+        {
+          username: process.env.ADMIN_USERNAME_2,
+          password: process.env.ADMIN_PASSWORD_2,
+          email: process.env.ADMIN_EMAIL_2,
+        },
+      ];
+      for (payload of payloads) {
+        const response = await request(app).post(path).send(payload);
+        expect(response.statusCode).toBe(400);
+        expect(response.body.data).toStrictEqual({});
+      }
+    });
+  });
 })
 
 describe('GET /api/v1/services', () => {
@@ -433,7 +458,7 @@ describe('GET /api/v1/services/:id', () => {
     });
   });
   
-  describe('given valid but non exists value', () => {
+  describe('given valid but non exists id', () => {
     test('should respond with a 404 status code & return empty data', async () => {
       const ids = [100, 2000, 10000]
       for (const id of ids) {
@@ -447,10 +472,6 @@ describe('GET /api/v1/services/:id', () => {
 
 describe('POST /api/v1/reviews', () => {
   const path = '/api/v1/reviews';
-  const header = {
-    Authorization: `Bearer ${tokenAdmin}`,
-    'Content-Type': 'application/json',
-  };
 
   describe('given valid auth token and valid params', () => {
     test('should respond with a 201 status code and return valid params', async () => {
@@ -503,7 +524,7 @@ describe('POST /api/v1/reviews', () => {
         },
       ];
       for (const payload of payloads) {
-        const response = await request(app).post(path).set(header).send(payload);
+        const response = await request(app).post(path).set(validHeader).send(payload);
         expect(response.statusCode).toBe(201);
         expect(response.body.data).toHaveProperty('id');
         expect(response.body.data).toHaveProperty('userId');
@@ -516,17 +537,264 @@ describe('POST /api/v1/reviews', () => {
     });
   });
 
-  // TODO: given valid auth token and invalid params
-  // TODO: given invalid auth token and valid params
-  // TODO: given invalid auth token and invalid params
+  describe('given valid auth token and not found \'serviceId\'', () => {
+    test('should respond with a 404 status code and return emptu object', async () => {
+      const payloads = [
+        // * valid 'userId'
+        {
+          userId: 1,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * Valid 'serviceId'
+        {
+          userId: 5,
+          serviceId: 3,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * Valid 'rating'
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: 1.2,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 3,
+          serviceId: 8,
+          rating: 3,
+          description: 'test - so far so good'
+        },
+        // * Valid 'description'
+        {
+          userId: 4,
+          serviceId: 8,
+          rating: 3,
+          description: ''
+        },
+      ];
+      for (const payload of payloads) {
+        const { serviceId } = payload;
+        payload.serviceId = serviceId * 100000 
+        const response = await request(app).post(path).set(validHeader).send(payload);
+        expect(response.statusCode).toBe(404);
+        expect(response.body.data).toStrictEqual({});
+      }
+    });
+  });
+
+  describe('given valid auth token and invalid params', () => {
+    test('should respond with a 400 status code and return emptu object', async () => {
+      const payloads = [
+        // * invalid 'userId'
+        {
+          userId: -100,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2.90,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: '2we',
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * invalid 'serviceId'
+        {
+          userId: 5,
+          serviceId: -3,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 8.5,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: '-55peh',
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * invalid 'rating'
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: -1.2,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 3,
+          serviceId: 8,
+          rating: 5.01,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 3,
+          serviceId: 8,
+          rating: '3q',
+          description: 'test - so far so good'
+        },
+      ];
+      for (const payload of payloads) {
+        const response = await request(app).post(path).set(validHeader).send(payload);
+        expect(response.statusCode).toBe(400);
+        expect(response.body.data).toStrictEqual({});
+      }
+    });
+  });
+
+  describe('given invalid auth token and valid params', () => {
+    test('should respond with a 401 status code and return empty object', async () => {
+      const payloads = [
+        // * valid 'userId'
+        {
+          userId: 1,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * Valid 'serviceId'
+        {
+          userId: 5,
+          serviceId: 3,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * Valid 'rating'
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: 1.2,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 3,
+          serviceId: 8,
+          rating: 3,
+          description: 'test - so far so good'
+        },
+        // * Valid 'description'
+        {
+          userId: 4,
+          serviceId: 8,
+          rating: 3,
+          description: ''
+        },
+      ];
+      for (const payload of payloads) {
+        const response = await request(app).post(path).set(invalidHeader).send(payload);
+        expect(response.statusCode).toBe(401);
+        expect(response.body.data).toStrictEqual({});
+      }
+    });
+  })
+  describe('given invalid auth token and invalid params', () => {
+    test('should respond with a 401 status code and return empty object', async () => {
+      const payloads = [
+        // * invalid 'userId'
+        {
+          userId: -100,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2.90,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: '2we',
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * invalid 'serviceId'
+        {
+          userId: 5,
+          serviceId: -3,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 8.5,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: '-55peh',
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * invalid 'rating'
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: -1.2,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 3,
+          serviceId: 8,
+          rating: 5.01,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 3,
+          serviceId: 8,
+          rating: '3q',
+          description: 'test - so far so good'
+        },
+      ];
+      for (const payload of payloads) {
+        const response = await request(app).post(path).set(invalidHeader).send(payload);
+        expect(response.statusCode).toBe(401);
+        expect(response.body.data).toStrictEqual({});
+      }
+    })
+  })
 });
 
 describe('PUT /api/v1/reviews/:id', () => {
   const path = '/api/v1/reviews';
-  const header = {
-    Authorization: `Bearer ${tokenAdmin}`,
-    'Content-Type': 'application/json',
-  };
 
   describe('given valid auth token and valid params', () => {
     test('should respond with a 200 status code and return valid params', async () => {
@@ -581,58 +849,452 @@ describe('PUT /api/v1/reviews/:id', () => {
       for (let i = 0; i < createdReviewIds.length; i++) {
         const id = createdReviewIds[i];
         const payload = payloads[i];
-        const response = await request(app).put(`${path}/${id}`).set(header).send(payload);
+        const response = await request(app).put(`${path}/${id}`).set(validHeader).send(payload);
         expect(response.statusCode).toBe(200);
-        // expect(response.body.data).toStrictEqual({});
+        expect(response.body.data).toHaveProperty('id');
+        expect(response.body.data).toHaveProperty('serviceId');
+        expect(response.body.data).toHaveProperty('userId');
+        expect(response.body.data).toHaveProperty('description');
+        expect(response.body.data).toHaveProperty('rating');
 
         userIdsWithReviews.push(response.body.data.userId);
       }
     });
   });
-  // TODO: given valid auth token and invalid params
-  // TODO: given invalid auth token and valid params
-  // TODO: given invalid auth token and invalid params
-});
 
-describe('GET /api/v1/users/:id/reviews', () => {
-  const path = '/api/v1/users';
-  const postfix = 'reviews';
-  const header = {
-    Authorization: `Bearer ${tokenAdmin}`,
-    'Content-Type': 'application/json',
-  };
-  
-  describe('given valid auth token and valid params', () => {
-    test('should respond with a 200 status code', async () => {
-      for (const id of userIdsWithReviews) {
-        const response = await request(app).get(`${path}/${id}/${postfix}`).set(header);
-        expect(response.statusCode).toBe(200);
+  describe('given valid auth token and not found \'reviewId\'', () => {
+    test('should respond with a 404 status code and return empty object data', async () => {
+      const payloads = [
+        // * valid 'userId'
+        {
+          userId: 1,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * Valid 'serviceId'
+        {
+          userId: 5,
+          serviceId: 3,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * Valid 'rating'
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: 1.2,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 3,
+          serviceId: 8,
+          rating: 3,
+          description: 'test - so far so good'
+        },
+        // * Valid 'description'
+        {
+          userId: 4,
+          serviceId: 8,
+          rating: 3,
+          description: ''
+        },
+      ];
+      for (let i = 0; i < createdReviewIds.length; i++) {
+        const id = createdReviewIds[i] * 1000000;
+        const payload = payloads[i];
+        const response = await request(app).put(`${path}/${id}`).set(validHeader).send(payload);
+        expect(response.statusCode).toBe(404);
+        expect(response.body.data).toStrictEqual({})
       }
     });
   });
-  // TODO: given valid auth token and invalid params
-  // TODO: given invalid auth token and valid params
-  // TODO: given invalid auth token and invalid params
-});
 
-describe('DELETE /api/v1/reviews/:id', () => {
-  const path = '/api/v1/reviews';
-  const header = {
-    Authorization: `Bearer ${tokenAdmin}`,
-    'Content-Type': 'application/json',
-  };
-  
-  describe('given valid auth token and valid params', () => {
-    test('should respond with a 200 status code and return empty object data', async () => {
-      for (const id of createdReviewIds) {
-        const response = await request(app).delete(`${path}/${id}`).set(header);
-        expect(response.statusCode).toBe(200);
+  describe('given valid auth token and not found \'serviceId\'', () => {
+    test('should respond with a 404 status code and return empty object data', async () => {
+      const payloads = [
+        // * valid 'userId'
+        {
+          userId: 1,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * Valid 'serviceId'
+        {
+          userId: 5,
+          serviceId: 3,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * Valid 'rating'
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: 1.2,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 3,
+          serviceId: 8,
+          rating: 3,
+          description: 'test - so far so good'
+        },
+        // * Valid 'description'
+        {
+          userId: 4,
+          serviceId: 8,
+          rating: 3,
+          description: ''
+        },
+      ];
+      for (let i = 0; i < createdReviewIds.length; i++) {
+        const id = createdReviewIds[i];
+        const payload = payloads[i];
+        const { serviceId } = payload;
+        payload.serviceId = serviceId * 1000000
+
+        const response = await request(app).put(`${path}/${id}`).set(validHeader).send(payload);
+        expect(response.statusCode).toBe(404);
         expect(response.body.data).toStrictEqual({});
       }
     });
   });
 
-  // TODO: given valid auth token and invalid params
-  // TODO: given invalid auth token and valid params
-  // TODO: given invalid auth token and invalid params
+  describe('given valid auth token and invalid params', () => {
+    test('should respond with a 400 status code and return empty object', async () => {
+      const payloads = [
+        // * invalid 'userId'
+        {
+          userId: -100,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2.90,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: '2we',
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * invalid 'serviceId'
+        {
+          userId: 5,
+          serviceId: -3,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 8.5,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: '-55peh',
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * invalid 'rating'
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: -1.2,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 3,
+          serviceId: 8,
+          rating: 5.01,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 3,
+          serviceId: 8,
+          rating: '3q',
+          description: 'test - so far so good'
+        },
+      ];
+      for (let i = 0; i < createdReviewIds.length; i++) {
+        const id = createdReviewIds[i];
+        const payload = payloads[i];
+        const response = await request(app).put(`${path}/${id}`).set(validHeader).send(payload);
+        expect(response.statusCode).toBe(400);
+      }
+    })
+  });
+
+  describe('given invalid auth token and valid params', () => {
+    test('should respond with a 401 status code and return empty object', async () => {
+      const payloads = [
+        // * valid 'userId'
+        {
+          userId: 1,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * Valid 'serviceId'
+        {
+          userId: 5,
+          serviceId: 3,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * Valid 'rating'
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: 1.2,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 3,
+          serviceId: 8,
+          rating: 3,
+          description: 'test - so far so good'
+        },
+        // * Valid 'description'
+        {
+          userId: 4,
+          serviceId: 8,
+          rating: 3,
+          description: ''
+        },
+      ];
+      for (let i = 0; i < createdReviewIds.length; i++) {
+        const id = createdReviewIds[i];
+        const payload = payloads[i];
+        const response = await request(app).put(`${path}/${id}`).set(invalidHeader).send(payload);
+        expect(response.statusCode).toBe(401);
+        expect(response.body.data).toStrictEqual({});
+      }
+    });
+  });
+
+  describe('given invalid auth token and invalid params', () => {
+    test('should respond with a 401 status code and return empty object', async () => {
+      const payloads = [
+        // * invalid 'userId'
+        {
+          userId: -100,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2.90,
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: '2we',
+          serviceId: 1,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * invalid 'serviceId'
+        {
+          userId: 5,
+          serviceId: -3,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: 8.5,
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 2,
+          serviceId: '-55peh',
+          rating: 5,
+          description: 'test - so far so good'
+        },
+        // * invalid 'rating'
+        {
+          userId: 2,
+          serviceId: 8,
+          rating: -1.2,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 3,
+          serviceId: 8,
+          rating: 5.01,
+          description: 'test - so far so good'
+        },
+        {
+          userId: 3,
+          serviceId: 8,
+          rating: '3q',
+          description: 'test - so far so good'
+        },
+      ];
+      for (let i = 0; i < createdReviewIds.length; i++) {
+        const id = createdReviewIds[i];
+        const payload = payloads[i];
+        const response = await request(app).put(`${path}/${id}`).set(invalidHeader).send(payload);
+        expect(response.statusCode).toBe(401);
+        expect(response.body.data).toStrictEqual({});
+      }
+    });
+  });
+});
+
+describe('GET /api/v1/users/:id/reviews', () => {
+  const path = '/api/v1/users';
+  const postfix = 'reviews';
+  
+  describe('given valid auth token and valid params', () => {
+    test('should respond with a 200 status code', async () => {
+      const params = {
+        page: 1,
+        show: 10,
+        sortBy: 'createdAt',
+        sortingMethod: 'desc',
+        keyword: 'test',
+      }
+      for (const id of userIdsWithReviews) {
+        const response = await request(app).get(`${path}/${id}/${postfix}`).set(validHeader).query(params);
+        expect(response.statusCode).toBe(200);
+        expect(response.body.data).toHaveProperty('id');
+        expect(response.body.data).toHaveProperty('username');
+        expect(response.body.data).toHaveProperty('email');
+        expect(response.body.data).toHaveProperty('reviews');
+      }
+    });
+  });
+
+  describe('given valid auth token and invalid params', () => {
+    test('should respond with a 400 status code and return empty object', async () => {
+      for (const id of userIdsWithReviews) {
+        const invalidId = `${id}-test`;
+        const response = await request(app).get(`${path}/${invalidId}/${postfix}`).set(validHeader);
+        expect(response.statusCode).toBe(400);
+        expect(response.body.data).toStrictEqual({});
+      }
+    });
+  });
+
+  describe('given invalid auth token and valid params', () => {
+    test('should respond with a 401 status code', async () => {
+      for (const id of userIdsWithReviews) {
+        const response = await request(app).get(`${path}/${id}/${postfix}`).set(invalidHeader);
+        expect(response.statusCode).toBe(401);
+      }
+    });
+  });
+
+  describe('given invalid auth token and invalid params', () => {
+    test('should respond with a 401 status code', async () => {
+      for (const id of userIdsWithReviews) {
+        const invalidId = `${id}-test`;
+        const response = await request(app).get(`${path}/${invalidId}/${postfix}`).set(invalidHeader);
+        expect(response.statusCode).toBe(401);
+      }
+    });
+  });
+});
+
+describe('DELETE /api/v1/reviews/:id', () => {
+  const path = '/api/v1/reviews';
+  
+  describe('given valid auth token and valid params', () => {
+    test('should respond with a 200 status code and return empty object data', async () => {
+      for (const id of createdReviewIds) {
+        const response = await request(app).delete(`${path}/${id}`).set(validHeader);
+        expect(response.statusCode).toBe(200);
+        expect(response.body.data).toStrictEqual({});
+      }
+    });
+  });
+  
+  describe('given valid auth token and not found \'id\'', () => {
+    test('should respond with a 404 status code and return empty object data', async () => {
+      for (const id of createdReviewIds) {
+        const notFoundId = id * 10000
+        const response = await request(app).delete(`${path}/${notFoundId}`).set(validHeader);
+        expect(response.statusCode).toBe(404);
+        expect(response.body.data).toStrictEqual({});
+      }
+    });
+  });
+
+  describe('given valid auth token and invalid params', () => {
+    test('should respond with a 400 status code and return empty object data', async () => {
+      for (const id of createdReviewIds) {
+        const invalidId = `${id}-test`;
+        const response = await request(app).delete(`${path}/${invalidId}`).set(validHeader);
+        expect(response.statusCode).toBe(400);
+        expect(response.body.data).toStrictEqual({});
+      }
+    });
+  });
+
+  describe('given invalid auth token and valid params', () => {
+    test('should respond with a 401 status code and return empty object data', async () => {
+      for (const id of createdReviewIds) {
+        const response = await request(app).delete(`${path}/${id}`).set(invalidHeader);
+        expect(response.statusCode).toBe(401);
+        expect(response.body.data).toStrictEqual({});
+      }
+    });
+  });
+
+  describe('given invalid auth token and invalid params', () => {
+    test('should respond with a 401 status code and return empty object data', async () => {
+      for (const id of createdReviewIds) {
+        const invalidId = `${id}-test`;
+        const response = await request(app).delete(`${path}/${invalidId}`).set(invalidHeader);
+        expect(response.statusCode).toBe(401);
+        expect(response.body.data).toStrictEqual({});
+      }
+    });
+  });
 });

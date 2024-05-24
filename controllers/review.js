@@ -13,6 +13,7 @@ module.exports = {
         data,
       })
     } catch (error) {
+      console.log(error);
       responseError(res, error);
     }
   },
@@ -27,6 +28,7 @@ module.exports = {
         data,
       })
     } catch (error) {
+      console.log(error);
       responseError(res, error);
     }
   },
@@ -40,6 +42,7 @@ module.exports = {
         data: {},
       })
     } catch (error) {
+      console.log(error);
       responseError(res, error);
     }
   },

@@ -8,10 +8,12 @@ module.exports = {
       userId: joi
         .number()
         .integer()
+        .min(1)
         .required(),
       serviceId: joi
         .number()
         .integer()
+        .min(1)
         .required(),
       rating: joi
         .number()
@@ -39,14 +41,17 @@ module.exports = {
       id: joi
         .number()
         .integer()
+        .min(1)
         .required(),
       userId: joi
         .number()
         .integer()
+        .min(1)
         .required(),
       serviceId: joi
         .number()
         .integer()
+        .min(1)
         .required(),
       rating: joi
         .number()
@@ -77,6 +82,7 @@ module.exports = {
       id: joi
         .number()
         .integer()
+        .min(1)
         .required(),
     });
     const validationResult = validationSchema.validate(req.params);
