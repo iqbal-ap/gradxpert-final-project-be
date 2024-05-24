@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --config=./config/jest.config.js --passWithNoTests",
-    "serve": "nodemon server.js"
+    "serve": "nodemon server.js",
+    "migration": "npx sequelize-cli db:migrate",
+    "seeder": "npx sequelize-cli db:seed:all"
   },
   "repository": {
     "type": "git",
