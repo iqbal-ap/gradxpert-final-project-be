@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    description: DataTypes.STRING,
+    description: DataTypes.TEXT,
     rating: {
       type: DataTypes.REAL,
       allowNull: false,
@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         max: 5,
       }
     },
-    address: DataTypes.STRING,
+    address: DataTypes.TEXT,
     phoneNumber: {
       type: DataTypes.STRING,
     },
