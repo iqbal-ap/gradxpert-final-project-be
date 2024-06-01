@@ -1,6 +1,7 @@
 const { ServiceServices } = require('../services/index');
 const { responseError, responseSuccess } = require('../helper/output');
 const { STATUS_CODES, STATUS_TEXT } = require('../helper/httpStatusCodes');
+const { createMetaPagination } = require('../helper/generalUtil');
 
 module.exports = {
   getListServices: async (req, res) => {
@@ -15,13 +16,15 @@ module.exports = {
     
     try {
       const limit = show || 10;
-      const offset =  show && page ? show * (page - 1 ) : 0;
+      const offset =  show && page ? show * (page - 1) : 0;
 
-      const data = await ServiceServices.getListServices(limit, offset, serviceTypeId, sortBy, sortingMethod, keyword);
+      const { total, data } = await ServiceServices.getListServices(limit, offset, serviceTypeId, sortBy, sortingMethod, keyword);
+      const meta = createMetaPagination(total, Number(page), Number(show));
+
       responseSuccess(res, {
         code: STATUS_CODES.OK,
         message: STATUS_TEXT[STATUS_CODES.OK],
-        data,
+        data: { meta, data },
       });
     } catch (error) {
       console.log(error);
@@ -38,14 +41,16 @@ module.exports = {
       keyword,
      } = req.query;
     try {
-      const limit = show || 10;
+      const limit = Number(show) || 10;
       const offset =  show && page ? show * (page - 1 ) : 0;
 
-      const data = await ServiceServices.getServiceById(id, limit, offset, sortBy, sortingMethod, keyword);
+      const { total, data } = await ServiceServices.getServiceByIdWithCount(id, limit, offset, sortBy, sortingMethod, keyword);
+      const meta = createMetaPagination(total, Number(page), Number(show));
+
       responseSuccess(res, {
         code: STATUS_CODES.OK,
         message: STATUS_TEXT[STATUS_CODES.OK],
-        data,
+        data: { meta, data },
       });
     } catch (error) {
       console.log(error);

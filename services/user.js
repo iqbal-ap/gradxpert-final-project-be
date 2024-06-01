@@ -38,17 +38,18 @@ module.exports = {
   },
   getReviewHistoryByUserId: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '', serviceId = 0) => {
     try {
-      const whereClauses = [{ deletedAt: null }];
-      if (keyword) {
-        whereClauses.push({
-          [models.Sequelize.Op.or]: [{ description: { [models.Sequelize.Op.iLike]: `%${keyword}%` } }]
-        })
-      }
+      const whereList = [];
       if (serviceId) {
-        whereClauses.push({ serviceId });
+        whereList.push(`r.\"serviceId\" = ${serviceId}`);
       }
-      const data = await UserRepository.getReviewHistoryByUserId(id, limit, offset, sortBy, sortingMethod, whereClauses);
-      return data;
+      if (keyword) {
+        whereList.push(`r.\"description\" ilike '%${keyword}%'`) 
+      }
+      const sorting = `r."${sortBy}" ${sortingMethod}`;
+      const whereClauses = `and ${whereList.join(' and ').toString()}`;
+      
+      const reviewHistory = await UserRepository.getReviewHistoryByUserIdWithCount(id, limit, offset, sorting, whereClauses);
+      return reviewHistory;
     } catch (error) {
       throw error;
     }

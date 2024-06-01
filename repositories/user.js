@@ -1,5 +1,6 @@
 const models = require('../models/index');
 const ERROR = require('../helper/error');
+const { STATUS_CODES } = require('../helper/httpStatusCodes');
 
 module.exports = {
   createUser: async (username, email, password, phoneNumber, role) => {
@@ -58,36 +59,111 @@ module.exports = {
       throw ERROR.INTERNAL_SERVER_ERROR;
     }
   },
-  getReviewHistoryByUserId: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', whereClauses = [{ deletedAt: null }]) => {
+  getReviewHistoryByUserIdWithCount: async (id, limit = 1, offset = 0, sorting = '', whereClauses = '') => {
     try {
-      const data = models.user.findOne({
-        attributes: ['id', 'username', 'email'],
-        where: {
+      const history = await models.DbConnection.query(`
+        with user_data as (
+          select 
+            u.id,
+            u.username,
+            u.email,
+            1 as join_key
+          from users u
+          where 
+            u.id = :id
+            and u."deletedAt" is null
+        ), review_data as (
+          select 
+            r.*,
+            json_build_object(
+              s.id,
+              s.name,
+              s.rating,
+              s.description
+            ) services 
+          from reviews r
+          right join user_data ud on ud.id = r."userId" 
+          join services s on s.id = r."serviceId" 
+          where 
+            r."deletedAt" is null
+            and s."deletedAt" is null
+            ${whereClauses}
+          order by ${sorting}
+        ), paginated_review_data as (
+          select
+            coalesce(
+              jsonb_agg(rd.*)
+              filter (where rd.id is not null),
+            '[]') reviews,
+            1 as join_key
+          from (
+          	select * 
+          	from review_data rd          	
+          	limit :limit
+          	offset :offset
+          ) rd
+        ), count_review_data as (
+          select
+            coalesce(count(rd.*), 0)::integer total,
+            1 as join_key
+          from review_data rd
+        )
+        select
+          crd.total,
+          jsonb_build_object (
+            'id', ud.id,
+            'username', ud.username,
+            'email', ud.email,
+            'reviews', prd.reviews
+          ) as data
+        from user_data ud
+        join count_review_data crd on crd.join_key = ud.join_key
+        left join paginated_review_data prd on ud.join_key = prd.join_key;
+      `, {
+        replacements: {
           id,
-          deletedAt: null,
+          limit,
+          offset,
         },
-        include: [
-          {
-            model: models.review,
-            where: { [models.Sequelize.Op.and]: whereClauses },
-            limit,
-            offset,
-            order: [[sortBy, sortingMethod]],
-            required: false,
-            include: [
-              {
-                model: models.service,
-                attributes: ['id', 'name', 'rating', 'description'],
-                where: { deletedAt: null },
-              }
-            ]
-          }          
-        ],
-      })
-      return data;
+        type: models.Sequelize.QueryTypes.SELECT,
+        raw: true,
+      });
+      return history[0];
     } catch (error) {
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;
     }
-  }
+  },
+  // getReviewHistoryByUserId: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', whereClauses = [{ deletedAt: null }]) => {
+  //   try {
+  //     const data = models.user.findOne({
+  //       attributes: ['id', 'username', 'email'],
+  //       where: {
+  //         id,
+  //         deletedAt: null,
+  //       },
+  //       include: [
+  //         {
+  //           model: models.review,
+  //           where: { [models.Sequelize.Op.and]: whereClauses },
+  //           limit,
+  //           offset,
+  //           order: [[sortBy, sortingMethod]],
+  //           required: false,
+  //           include: [
+  //             {
+  //               model: models.service,
+  //               attributes: ['id', 'name', 'rating', 'description'],
+  //               where: { deletedAt: null },
+  //             }
+  //           ]
+  //         }          
+  //       ],
+  //     })
+  //     return data;
+  //   } catch (error) {
+  //     console.log(error);
+  //     throw ERROR.INTERNAL_SERVER_ERROR;
+  //   }
+  // }
 }

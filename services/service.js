@@ -5,15 +5,38 @@ const ERROR = require('../helper/error');
 module.exports = {
   getListServices: async (limit = 10, offset = 0, serviceTypeId = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '') => {
     try {
-      const whereClauses = [{ deletedAt: null }];
+      const whereList = ["s.\"deletedAt\" is null "];
       if (serviceTypeId) {
-        whereClauses.push({ serviceTypeId });
+        whereList.push(`s.\"serviceTypeId\" = ${serviceTypeId}`);
       }
       if (keyword) {
-        whereClauses.push({ name: { [models.Sequelize.Op.iLike]: `%${keyword}%` } })
+        whereList.push(`s.\"name\" ilike '%${keyword}%'`) 
       }
-      const services = await ServiceRepository.getListServices(limit, offset, sortBy, sortingMethod, whereClauses);
-      return services;
+      const sorting = `s."${sortBy}" ${sortingMethod}`;
+      const whereClauses = whereList.join(' and ').toString();
+      
+      const servicesWithCount = await ServiceRepository.getListServicesWithCount(limit, offset, sorting, whereClauses)
+        .then(res => res[0]);
+      return servicesWithCount;
+    } catch (error) {
+      throw error;
+    }
+  },
+  getServiceByIdWithCount: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '') => {
+    try {
+      const whereList = ["r.\"deletedAt\" is null "];
+      if (keyword) {
+        whereList.push(`r.\"description\" ilike '%${keyword}%'`) 
+      }
+      const sorting = `r."${sortBy}" ${sortingMethod}`;
+      const whereClauses = whereList.join(' and ').toString();
+      const service = await ServiceRepository.getServiceByIdWithCount(id, limit, offset, sorting, whereClauses)
+        .then(res => res[0]);
+      if (!service?.data) {
+        throw new ERROR.NotFoundError('Service');
+      }
+
+      return service;
     } catch (error) {
       throw error;
     }

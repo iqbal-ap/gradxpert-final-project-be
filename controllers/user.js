@@ -1,6 +1,7 @@
 const { UserServices } = require('../services/index');
 const { responseError, responseSuccess } = require('../helper/output');
 const { STATUS_CODES, STATUS_TEXT } = require('../helper/httpStatusCodes');
+const { createMetaPagination } = require('../helper/generalUtil');
 
 module.exports = {
   getReviewHistoryByUserId: async (req, res) => {
@@ -17,11 +18,13 @@ module.exports = {
       const limit = show || 10;
       const offset =  show && page ? show * (page - 1 ) : 0;
 
-      const data = await UserServices.getReviewHistoryByUserId(id, limit, offset, sortBy, sortingMethod, keyword, serviceId);
+      const { total, data } = await UserServices.getReviewHistoryByUserId(id, limit, offset, sortBy, sortingMethod, keyword, serviceId);
+      const meta = createMetaPagination(total, Number(page), Number(show));
+
       responseSuccess(res, {
         code: STATUS_CODES.OK,
         message: STATUS_TEXT[STATUS_CODES.OK],
-        data,
+        data: { meta, data },
       });
     } catch (error) {
       console.log(error);
