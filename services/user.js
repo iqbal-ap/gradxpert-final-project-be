@@ -36,7 +36,7 @@ module.exports = {
       throw error;
     }
   },
-  getReviewHistoryByUserId: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '') => {
+  getReviewHistoryByUserId: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '', serviceId = 0) => {
     try {
       const whereClauses = [{ deletedAt: null }];
       if (keyword) {
@@ -44,7 +44,9 @@ module.exports = {
           [models.Sequelize.Op.or]: [{ description: { [models.Sequelize.Op.iLike]: `%${keyword}%` } }]
         })
       }
-
+      if (serviceId) {
+        whereClauses.push({ serviceId });
+      }
       const data = await UserRepository.getReviewHistoryByUserId(id, limit, offset, sortBy, sortingMethod, whereClauses);
       return data;
     } catch (error) {

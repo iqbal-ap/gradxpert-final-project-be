@@ -20,6 +20,11 @@ module.exports = {
         .integer()
         .min(1)
         .default(10),
+      serviceId: joi
+        .number()
+        .integer()
+        .min(1)
+        .optional(),
       sortBy: joi
         .string()
         .valid('id', 'createdAt', 'updatedAt', 'rating')

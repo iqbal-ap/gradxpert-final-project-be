@@ -1,7 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const { AuthMiddleware, ServiceMiddleware, ReviewMiddleware, UserMiddleware } = require('../middlewares/index');
-const { AuthController, ServiceController, ReviewController, UserController } = require('../controllers/index');
+const {
+  AuthMiddleware,
+  ServiceMiddleware,
+  ReviewMiddleware,
+  UserMiddleware,
+} = require('../middlewares/index');
+const {
+  AuthController,
+  ServiceController,
+  ReviewController,
+  UserController,
+  ServiceTypeController,
+} = require('../controllers/index');
 
 //  * Auth Feature
 router.post(
@@ -53,5 +64,11 @@ router.get(
   AuthMiddleware.validateUserToken,
   UserMiddleware.validateGetReviewHistoryParams,
   UserController.getReviewHistoryByUserId
+)
+
+// * Service Type Feature
+router.get(
+  '/service-types/select',
+  ServiceTypeController.getSelectListServiceTypes
 )
 module.exports = router;

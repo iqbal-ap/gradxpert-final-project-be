@@ -1,5 +1,5 @@
 const models = require('../models/index');
-const ERROR = require('../helper/error')
+const ERROR = require('../helper/error');
 
 module.exports = {
   getListServices: async (limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', whereClauses = [{ deletedAt: null }]) => {
@@ -21,7 +21,7 @@ module.exports = {
       throw ERROR.INTERNAL_SERVER_ERROR;
     }
   },
-  getServiceById: async (id) => {
+  getServiceById: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', whereReviewClauses = [{ deletedAt: null }]) => {
     try {
       const service = await models.service.findOne({
         where: {
@@ -36,8 +36,11 @@ module.exports = {
           },
           {
             model: models.review,
-            where: { deletedAt: null },
+            where: { [models.Sequelize.Op.and]: whereReviewClauses },
             required: false,
+            limit,
+            offset,
+            order: [[sortBy, sortingMethod]],
             include: [{
               model: models.user,
               required: false,

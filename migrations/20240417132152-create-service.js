@@ -18,14 +18,14 @@ module.exports = {
         allowNull: false,
       },
       description: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       rating: {
         type: Sequelize.REAL,
         allowNull: false,
       },
       address: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
       },
       phoneNumber: {
         type: Sequelize.STRING,
