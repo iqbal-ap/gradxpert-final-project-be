@@ -38,7 +38,10 @@ module.exports = {
   },
   getReviewHistoryByUserId: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '', serviceId = 0) => {
     try {
-      const whereList = [];
+      const whereList = [
+        'r."deletedAt" is null',
+        's."deletedAt" is null',
+      ];
       if (serviceId) {
         whereList.push(`r.\"serviceId\" = ${serviceId}`);
       }
@@ -46,7 +49,7 @@ module.exports = {
         whereList.push(`r.\"description\" ilike '%${keyword}%'`) 
       }
       const sorting = `r."${sortBy}" ${sortingMethod}`;
-      const whereClauses = `and ${whereList.join(' and ').toString()}`;
+      const whereClauses = whereList.join(' and ').toString();
       
       const reviewHistory = await UserRepository.getReviewHistoryByUserIdWithCount(id, limit, offset, sorting, whereClauses);
       return reviewHistory;

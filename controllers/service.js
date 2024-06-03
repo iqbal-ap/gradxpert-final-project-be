@@ -56,5 +56,20 @@ module.exports = {
       console.log(error);
       responseError(res, error);
     }
+  },
+  getRelatedService: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const data = await ServiceServices.getRelatedService(id);
+      responseSuccess(res, {
+        code: STATUS_CODES.OK,
+        message: STATUS_TEXT[STATUS_CODES.OK],
+        data,
+      });
+    } catch (error) {
+      console.log(error);
+      responseError(res, error);
+      
+    }
   }
 }

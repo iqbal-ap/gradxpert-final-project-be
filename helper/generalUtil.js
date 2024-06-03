@@ -5,14 +5,12 @@ module.exports = {
     
     let previousPage = null;
     if (page <= lastPage && page > 1) {
-      previousPage = page + 1;
+      previousPage = page - 1;
     } 
 
     let nextPage = null;
     if (page < lastPage) {
       nextPage = page + 1;
-    } else if (page === lastPage) {
-      nextPage = page
     }
 
     return {

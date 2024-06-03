@@ -59,7 +59,7 @@ module.exports = {
       throw ERROR.INTERNAL_SERVER_ERROR;
     }
   },
-  getReviewHistoryByUserIdWithCount: async (id, limit = 1, offset = 0, sorting = '', whereClauses = '') => {
+  getReviewHistoryByUserIdWithCount: async (id, limit = 1, offset = 0, sorting = 'r.id asc', whereClauses = '') => {
     try {
       const history = await models.DbConnection.query(`
         with user_data as (
@@ -84,10 +84,7 @@ module.exports = {
           from reviews r
           right join user_data ud on ud.id = r."userId" 
           join services s on s.id = r."serviceId" 
-          where 
-            r."deletedAt" is null
-            and s."deletedAt" is null
-            ${whereClauses}
+          where ${whereClauses}
           order by ${sorting}
         ), paginated_review_data as (
           select

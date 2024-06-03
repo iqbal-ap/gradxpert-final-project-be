@@ -88,5 +88,23 @@ module.exports = {
       });
     }
     next()
-  }
+  },
+  validateGetRelatedService: async (req, res, next) => {
+    const validationSchema = joi.object({
+      id: joi
+        .number()
+        .integer()
+        .min(1)
+        .required(),
+    });
+    const validationResult = validationSchema.validate(req.params);
+    if (validationResult.error) {
+      console.log(new ERROR.BadRequestError(validationResult.error.message))
+      return responseError(res, {
+        code: STATUS_CODES.BadRequest,
+        message: validationResult.error.message,
+      });
+    }
+    next()
+  },
 }

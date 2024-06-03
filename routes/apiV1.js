@@ -37,6 +37,11 @@ router.get(
   ServiceMiddleware.validateGetById,
   ServiceController.getServiceById
 )
+router.get(
+  '/services/:id/related',
+  ServiceMiddleware.validateGetRelatedService,
+  ServiceController.getRelatedService
+)
 
 // * Review Feature
 router.post(

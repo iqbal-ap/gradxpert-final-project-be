@@ -5,7 +5,7 @@ const ERROR = require('../helper/error');
 module.exports = {
   getListServices: async (limit = 10, offset = 0, serviceTypeId = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '') => {
     try {
-      const whereList = ["s.\"deletedAt\" is null "];
+      const whereList = ["s.\"deletedAt\" is null"];
       if (serviceTypeId) {
         whereList.push(`s.\"serviceTypeId\" = ${serviceTypeId}`);
       }
@@ -24,7 +24,7 @@ module.exports = {
   },
   getServiceByIdWithCount: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '') => {
     try {
-      const whereList = ["r.\"deletedAt\" is null "];
+      const whereList = ["r.\"deletedAt\" is null"];
       if (keyword) {
         whereList.push(`r.\"description\" ilike '%${keyword}%'`) 
       }
@@ -64,5 +64,15 @@ module.exports = {
     } catch (error) {
       throw error;
     }
-  }
+  },
+  getRelatedService: async (id) => {
+    try {
+      const service = await ServiceRepository.getServiceById(id);
+      const { serviceTypeId } = service;
+      const relatedServices = await ServiceRepository.getRelatedService(id, serviceTypeId);
+      return relatedServices;
+    } catch (error) {
+      throw error;
+    }
+  },
 }

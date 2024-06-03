@@ -222,5 +222,23 @@ module.exports = {
       console.log(error);
       throw ERROR.INTERNAL_SERVER_ERROR;      
     }
-  }
+  },
+  getRelatedService: async (id, serviceTypeId, limit = 5) => {
+    try {
+      const service = await models.service.findAll({
+        where: {
+          id: {
+            [models.Sequelize.Op.not]: id,
+          },
+          serviceTypeId,
+          deletedAt: null,
+        },
+        limit
+      });
+      return service;
+    } catch (error) {
+      console.log(error)
+      throw ERROR.INTERNAL_SERVER_ERROR;
+    }
+  },
 }
