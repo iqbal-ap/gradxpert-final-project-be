@@ -272,18 +272,18 @@ describe('GET /api/v1/services', () => {
     });
     test('should respond with defined response\'s properties', async () => {
       const response = await request(app).get(path);
-      expect(response.body.data[0]).toHaveProperty('id');
-      expect(response.body.data[0]).toHaveProperty('name');
-      expect(response.body.data[0]).toHaveProperty('description');
-      expect(response.body.data[0]).toHaveProperty('rating');
-      expect(response.body.data[0]).toHaveProperty('phoneNumber');
-      expect(response.body.data[0]).toHaveProperty('createdAt');
-      expect(response.body.data[0]).toHaveProperty('updatedAt');
-      expect(response.body.data[0]).toHaveProperty('deletedAt');
-      expect(response.body.data[0]).toHaveProperty('serviceTypeId');
-      expect(response.body.data[0]).toHaveProperty('serviceType');
-      expect(response.body.data[0]?.serviceType).toHaveProperty('id');
-      expect(response.body.data[0]?.serviceType).toHaveProperty('name');
+      expect(response.body.data.data[0]).toHaveProperty('id');
+      expect(response.body.data.data[0]).toHaveProperty('name');
+      expect(response.body.data.data[0]).toHaveProperty('description');
+      expect(response.body.data.data[0]).toHaveProperty('rating');
+      expect(response.body.data.data[0]).toHaveProperty('phoneNumber');
+      expect(response.body.data.data[0]).toHaveProperty('createdAt');
+      expect(response.body.data.data[0]).toHaveProperty('updatedAt');
+      expect(response.body.data.data[0]).toHaveProperty('deletedAt');
+      expect(response.body.data.data[0]).toHaveProperty('serviceTypeId');
+      expect(response.body.data.data[0]).toHaveProperty('serviceType');
+      expect(response.body.data.data[0]?.serviceType).toHaveProperty('id');
+      expect(response.body.data.data[0]?.serviceType).toHaveProperty('name');
     });
   });
 
@@ -335,18 +335,18 @@ describe('GET /api/v1/services', () => {
       for (const params of customQueryParams) {
         const response = await request(app).get(path).query(params)
         expect(response.statusCode).toBe(200);
-        expect(response.body.data[0]).toHaveProperty('id');
-        expect(response.body.data[0]).toHaveProperty('name');
-        expect(response.body.data[0]).toHaveProperty('description');
-        expect(response.body.data[0]).toHaveProperty('rating');
-        expect(response.body.data[0]).toHaveProperty('phoneNumber');
-        expect(response.body.data[0]).toHaveProperty('createdAt');
-        expect(response.body.data[0]).toHaveProperty('updatedAt');
-        expect(response.body.data[0]).toHaveProperty('deletedAt');
-        expect(response.body.data[0]).toHaveProperty('serviceTypeId');
-        expect(response.body.data[0]).toHaveProperty('serviceType');
-        expect(response.body.data[0]?.serviceType).toHaveProperty('id');
-        expect(response.body.data[0]?.serviceType).toHaveProperty('name');
+        expect(response.body.data.data[0]).toHaveProperty('id');
+        expect(response.body.data.data[0]).toHaveProperty('name');
+        expect(response.body.data.data[0]).toHaveProperty('description');
+        expect(response.body.data.data[0]).toHaveProperty('rating');
+        expect(response.body.data.data[0]).toHaveProperty('phoneNumber');
+        expect(response.body.data.data[0]).toHaveProperty('createdAt');
+        expect(response.body.data.data[0]).toHaveProperty('updatedAt');
+        expect(response.body.data.data[0]).toHaveProperty('deletedAt');
+        expect(response.body.data.data[0]).toHaveProperty('serviceTypeId');
+        expect(response.body.data.data[0]).toHaveProperty('serviceType');
+        expect(response.body.data.data[0]?.serviceType).toHaveProperty('id');
+        expect(response.body.data.data[0]?.serviceType).toHaveProperty('name');
       }
     }); 
   });
@@ -434,15 +434,15 @@ describe('GET /api/v1/services/:id', () => {
       for (let id = 1; id < 16; id ++) {
         const response = await request(app).get(`${path}/${id}`);
         expect(response.statusCode).toBe(200);
-        expect(response.body.data).toHaveProperty('id');
-        expect(response.body.data).toHaveProperty('name');
-        expect(response.body.data).toHaveProperty('description');
-        expect(response.body.data).toHaveProperty('rating');
-        expect(response.body.data).toHaveProperty('address');
-        expect(response.body.data).toHaveProperty('phoneNumber');
-        expect(response.body.data).toHaveProperty('serviceTypeId');
-        expect(response.body.data).toHaveProperty('serviceType');
-        expect(response.body.data).toHaveProperty('reviews');
+        expect(response.body.data.data).toHaveProperty('id');
+        expect(response.body.data.data).toHaveProperty('name');
+        expect(response.body.data.data).toHaveProperty('description');
+        expect(response.body.data.data).toHaveProperty('rating');
+        expect(response.body.data.data).toHaveProperty('address');
+        expect(response.body.data.data).toHaveProperty('phoneNumber');
+        expect(response.body.data.data).toHaveProperty('serviceTypeId');
+        expect(response.body.data.data).toHaveProperty('serviceType');
+        expect(response.body.data.data).toHaveProperty('reviews');
       }
     });
   });
@@ -1203,10 +1203,10 @@ describe('GET /api/v1/users/:id/reviews', () => {
       for (const id of userIdsWithReviews) {
         const response = await request(app).get(`${path}/${id}/${postfix}`).set(validHeader).query(params);
         expect(response.statusCode).toBe(200);
-        expect(response.body.data).toHaveProperty('id');
-        expect(response.body.data).toHaveProperty('username');
-        expect(response.body.data).toHaveProperty('email');
-        expect(response.body.data).toHaveProperty('reviews');
+        expect(response.body.data.data).toHaveProperty('id');
+        expect(response.body.data.data).toHaveProperty('username');
+        expect(response.body.data.data).toHaveProperty('email');
+        expect(response.body.data.data).toHaveProperty('reviews');
       }
     });
   });
@@ -1250,7 +1250,6 @@ describe('DELETE /api/v1/reviews/:id', () => {
       for (const id of createdReviewIds) {
         const response = await request(app).delete(`${path}/${id}`).set(validHeader);
         expect(response.statusCode).toBe(200);
-        expect(response.body.data).toStrictEqual({});
       }
     });
   });

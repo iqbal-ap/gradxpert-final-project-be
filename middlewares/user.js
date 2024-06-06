@@ -43,11 +43,10 @@ module.exports = {
       ...req.query,
     });
     if (validationResult.error) {
-      console.log(validationResult.error.message)
-      return responseError(res, {
-        code: STATUS_CODES.BadRequest,
-        message: validationResult.error.message,
-      });
+      const { error } = validationResult;
+      error.code = STATUS_CODES.BadRequest;
+      console.log(error)
+      return responseError(res, error);
     }
     next()
   },
@@ -63,6 +62,7 @@ module.exports = {
     if (validationResult.error) {
       const { error } = validationResult;
       error.code = STATUS_CODES.BadRequest;
+      console.log(error)
       return responseError(res, error);
     }
     next()

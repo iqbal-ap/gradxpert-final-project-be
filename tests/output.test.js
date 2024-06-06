@@ -1,6 +1,6 @@
 const { responseError, responseSuccess } = require('../helper/output');
 const { STATUS_CODES, STATUS_TEXT } = require('../helper/httpStatusCodes');
-const { BAD_REQUEST, INTERNAL_SERVER_ERROR } = require('../helper/error');
+const { BadRequestError, NotFoundError } = require('../helper/error');
 
 const mockResponse = {
   statusCode: 200,
@@ -37,8 +37,8 @@ const successPayloads = [
   }
 ];
 const errorPayloads = [
-  BAD_REQUEST,
-  INTERNAL_SERVER_ERROR,
+  new BadRequestError(),
+  new NotFoundError(),
 ];
 
 describe('Send success response', () => {

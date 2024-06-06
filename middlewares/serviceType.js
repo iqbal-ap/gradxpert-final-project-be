@@ -14,11 +14,10 @@ module.exports = {
     });
     const validationResult = validationSchema.validate(req.params);
     if (validationResult.error) {
-      console.log(new ERROR.BadRequestError(validationResult.error.message))
-      return responseError(res, {
-        code: STATUS_CODES.BadRequest,
-        message: validationResult.error.message,
-      });
+      const { error } = validationResult;
+      error.code = STATUS_CODES.BadRequest;
+      console.log(error)
+      return responseError(res, error);
     }
     next()
   },

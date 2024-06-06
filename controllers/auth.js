@@ -21,7 +21,7 @@ module.exports = {
   register: async (req, res) => {
     const { username, email, password, phoneNumber } = req.body;
     try {
-      const data = await AuthServices.register(username, email, password, phoneNumber);
+      const _ = await AuthServices.register(username, email, password, phoneNumber);
       responseSuccess(res, {
         code: STATUS_CODES.Created,
         message: 'Successfully create data',

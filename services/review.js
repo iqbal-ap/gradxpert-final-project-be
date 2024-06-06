@@ -2,6 +2,7 @@ const models = require('../models/index');
 const { ReviewRepository } = require('../repositories/index');
 const ERROR = require('../helper/error');
 const ServiceServices = require('./service');
+const ERROR_MSG = require('../helper/customErrorMsgs');
 
 module.exports = {
   getReviewById: async (id) => {
@@ -42,7 +43,7 @@ module.exports = {
       // * Check whether service exists
       const service = await ServiceServices.getServiceById(serviceId);
       if (!service) {
-        throw ERROR.SERVICE_NOT_FOUND;
+        throw new ERROR.NotFoundError(ERROR_MSG.SERVICE_NOT_FOUND);
       }
 
       // * Check if first review or not
@@ -72,7 +73,6 @@ module.exports = {
       return review;
     } catch (error) {
       await transaction.rollback();
-      console.log(error);
       throw error;
     }
   },
@@ -82,13 +82,13 @@ module.exports = {
       // * Check whether review exists
       const review = await ReviewRepository.getReviewById(reviewId);
       if (!review) {
-        throw ERROR.REVIEW_NOT_FOUND;
+        throw new ERROR.NotFoundError(ERROR_MSG.REVIEW_NOT_FOUND);
       }
 
       // * Check whether service exists
       const service = await ServiceServices.getServiceById(serviceId);
       if (!service) {
-        throw ERROR.SERVICE_NOT_FOUND;
+        throw new ERROR.NotFoundError(ERROR_MSG.SERVICE_NOT_FOUND);
       }
 
       // * Update review
@@ -124,13 +124,13 @@ module.exports = {
       // * Check whether review exists
       const review = await ReviewRepository.getReviewById(reviewId);
       if (!review) {
-        throw ERROR.REVIEW_NOT_FOUND;
+        throw new ERROR.NotFoundError(ERROR_MSG.REVIEW_NOT_FOUND);
       }
 
       // * Update related service's rating
       const service = await ServiceServices.getServiceById(review.serviceId);
       if (!service) {
-        throw ERROR.SERVICE_NOT_FOUND;
+        throw new ERROR.NotFoundError(ERROR_MSG.SERVICE_NOT_FOUND);
       }
       const { total, numOfReview } = await ReviewRepository.getTotalRatingByServiceIdExcludeOne(review.serviceId, reviewId);
       const newRating = numOfReview ? total / numOfReview : 0;
@@ -152,7 +152,6 @@ module.exports = {
       return newReview;
     } catch (error) {
       await transaction.rollback();
-      console.log(error);
       throw error;
     }
   },

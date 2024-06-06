@@ -39,7 +39,7 @@ module.exports = {
       responseSuccess(res, {
         code: STATUS_CODES.OK,
         message: 'Successfully delete data',
-        data: {},
+        data,
       })
     } catch (error) {
       console.log(error);

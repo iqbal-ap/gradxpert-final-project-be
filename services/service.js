@@ -2,6 +2,7 @@ const models = require('../models/index');
 const ServiceTypeServices = require('./serviceType');
 const { ServiceRepository } = require('../repositories/index');
 const ERROR = require('../helper/error');
+const ERROR_MSG = require('../helper/customErrorMsgs');
 
 module.exports = {
   getListServices: async (limit = 10, offset = 0, serviceTypeId = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '') => {
@@ -34,7 +35,7 @@ module.exports = {
       const service = await ServiceRepository.getServiceByIdWithCount(id, limit, offset, sorting, whereClauses)
         .then(res => res[0]);
       if (!service?.data) {
-        throw new ERROR.NotFoundError('Service');
+        throw new ERROR.NotFoundError(ERROR_MSG.SERVICE_NOT_FOUND);
       }
 
       return service;
@@ -62,7 +63,7 @@ module.exports = {
     try {
       const serviceType = await ServiceTypeServices.getServiceTypeById(serviceTypeId);
       if (!serviceType) {
-        throw new ERROR.NotFoundError('Service type not found');
+        throw new ERROR.NotFoundError(ERROR_MSG.SERVICE_TYPE_NOT_FOUND);
       }
       const service = await ServiceRepository.updateServiceById(id, name, description, rating, address, phoneNumber, serviceTypeId, transaction);
       return service;
@@ -74,7 +75,7 @@ module.exports = {
     try {
       const serviceType = await ServiceTypeServices.getServiceTypeById(serviceTypeId);
       if (!serviceType) {
-        throw new ERROR.NotFoundError('Service type not found');
+        throw new ERROR.NotFoundError(ERROR_MSG.SERVICE_TYPE_NOT_FOUND);
       }
       const service = await ServiceRepository.createService(name, description, rating, address, phoneNumber, serviceTypeId);
       return service;
@@ -96,7 +97,7 @@ module.exports = {
     try {
       const service = await ServiceRepository.getServiceById(id);
       if (!service) {
-        throw new ERROR.NotFoundError('Service not found');
+        throw new ERROR.NotFoundError(ERROR_MSG.SERVICE_NOT_FOUND);
       }
       const deletedService = await ServiceRepository.deleteServiceById(id);
       return deletedService;

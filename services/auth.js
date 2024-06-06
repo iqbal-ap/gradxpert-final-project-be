@@ -16,7 +16,7 @@ module.exports = {
       // Encrypt Password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        throw new ERROR.BAD_REQUEST(ERROR_MSG.INVALID_USERNAME_PASSWORD);
+        throw new ERROR.BadRequestError(ERROR_MSG.INVALID_USERNAME_PASSWORD);
       }
 
       // Generate Token

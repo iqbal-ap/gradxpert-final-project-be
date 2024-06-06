@@ -1,7 +1,8 @@
 const joi = require('joi');
+const ERROR = require('../helper/error');
+const ERROR_MSG = require('../helper/customErrorMsgs');
 const { responseError } = require('../helper/output');
 const { STATUS_CODES } = require('../helper/httpStatusCodes');
-const ERROR = require('../helper/error');
 const { AuthServices } = require('../services');
 
 module.exports = {
@@ -22,11 +23,10 @@ module.exports = {
     });
     const validationResult = validationSchema.validate(req.body)
     if (validationResult.error) {
-      console.log(validationResult.error.message)
-      return responseError(res, {
-        code: STATUS_CODES.BadRequest,
-        message: validationResult.error.message,
-      });
+      const { error } = validationResult;
+      error.code = STATUS_CODES.BadRequest;
+      console.log(error)
+      return responseError(res, error);
     }
     next()
   },
@@ -51,11 +51,10 @@ module.exports = {
     });
     const validationResult = validationSchema.validate(req.body)
     if (validationResult.error) {
-      console.log(validationResult.error.message)
-      return responseError(res, {
-        code: STATUS_CODES.BadRequest,
-        message: validationResult.error.message,
-      });
+      const { error } = validationResult;
+      error.code = STATUS_CODES.BadRequest;
+      console.log(error)
+      return responseError(res, error);
     }
     next()
   },
@@ -77,7 +76,7 @@ module.exports = {
     try {
       const { user } = req;
       if (!user) {
-        throw new ERROR.NotFoundError('User not found');
+        throw new ERROR.NotFoundError(ERROR_MSG.USER_NOT_FOUND);
       }
       if (user.role !== 'admin') {
         throw new ERROR.UnauthorizedError();

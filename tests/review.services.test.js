@@ -3,6 +3,7 @@ const { authenticateDb } = require('../helper/db');
 const { ReviewServices } = require('../services/index');
 const models  = require('../models/index');
 const ERROR = require('../helper/error');
+const { STATUS_CODES } = require('../helper/httpStatusCodes');
 
 beforeAll(async () => {
   await authenticateDb(models.DbConnection);
@@ -25,7 +26,7 @@ describe('getReviewById', () => {
       for (let id = 20; id < 31; id++) {
         id = `${id}-test`
         const review = await ReviewServices.getReviewById(id).catch(e => e);
-        expect(review).toStrictEqual(ERROR.INTERNAL_SERVER_ERROR)
+        expect(review.code).toBe(STATUS_CODES.InternalServerError)
       }
     })
   });
@@ -50,7 +51,7 @@ describe('getReviewByServiceId', () => {
       for (let id of serviceIds) {
         id = `${id}-test`
         const review = await ReviewServices.getReviewByServiceId(id).catch(e => e);
-        expect(review).toStrictEqual(ERROR.INTERNAL_SERVER_ERROR);
+        expect(review.code).toBe(STATUS_CODES.InternalServerError)
       }
     });
   });
@@ -76,7 +77,7 @@ describe('getTotalRatingByServiceId', () => {
       for (let id of serviceIds) {
         id = `${id}-test`
         const review = await ReviewServices.getTotalRatingByServiceId(id).catch(e => e);
-        expect(review).toStrictEqual(ERROR.INTERNAL_SERVER_ERROR);
+        expect(review.code).toBe(STATUS_CODES.InternalServerError)
       }
     });
   });
@@ -102,7 +103,7 @@ describe('getTotalRatingByServiceIdExcludeOne', () => {
       for (let id of serviceIds) {
         id = `${id}-test`
         const review = await ReviewServices.getTotalRatingByServiceIdExcludeOne(id, id === 1 ? 20 : 24).catch(e => e);
-        expect(review).toStrictEqual(ERROR.INTERNAL_SERVER_ERROR);
+        expect(review.code).toBe(STATUS_CODES.InternalServerError)
       }
     });
   });

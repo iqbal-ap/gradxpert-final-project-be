@@ -62,11 +62,11 @@ module.exports = {
   deleteServiceTypeById: async (req, res) => {
     const { id } = req.params;
     try {
-      const _ = await ServiceTypeServices.deleteServiceTypeById(id);
+      const data = await ServiceTypeServices.deleteServiceTypeById(id);
       responseSuccess(res, {
         code: STATUS_CODES.OK,
         message: STATUS_TEXT[STATUS_CODES.OK],
-        data: {},
+        data,
       });
     } catch (error) {
       console.log(error);

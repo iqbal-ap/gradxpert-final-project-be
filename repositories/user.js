@@ -21,7 +21,8 @@ module.exports = {
       return user;
     } catch (error) {
       await transaction.rollback()
-      console.log(error)
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;
     }
   },
   updateUserById: async (id, username, email, phoneNumber) => {
@@ -53,7 +54,6 @@ module.exports = {
     } catch (error) {
       await transaction.rollback();
       error.code = STATUS_CODES.InternalServerError;
-      console.log(error)
       throw error;
     }
   },
@@ -83,7 +83,6 @@ module.exports = {
     } catch (error) {
       await transaction.rollback();
       error.code = STATUS_CODES.InternalServerError;
-      console.log(error)
       throw error;
     }
   },
@@ -118,8 +117,8 @@ module.exports = {
       })
       return users;
     } catch (error) {
-      console.log(error)
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;
     }
   },
   getReviewHistoryByUserIdWithCount: async (id, limit = 1, offset = 0, sorting = 'r.id asc', whereClauses = '') => {
@@ -139,10 +138,10 @@ module.exports = {
           select 
             r.*,
             json_build_object(
-              s.id,
-              s.name,
-              s.rating,
-              s.description
+              'id', s.id,
+              'name', s.name,
+              'rating', s.rating,
+              'description', s.description
             ) services 
           from reviews r
           right join user_data ud on ud.id = r."userId" 

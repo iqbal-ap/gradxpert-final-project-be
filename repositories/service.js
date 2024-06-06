@@ -149,8 +149,8 @@ module.exports = {
       });
       return service;
     } catch (error) {
-      console.log(error)
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;
     }
   },
   updateServiceById: async (id, name, description, rating, address, phoneNumber, serviceTypeId, trx) => {
@@ -180,8 +180,8 @@ module.exports = {
       return service;
     } catch (error) {
       await transaction.rollback();
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;      
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;     
     }
   },
   deleteServiceById: async (id) => {
@@ -205,8 +205,7 @@ module.exports = {
     } catch (error) {
       await transaction.rollback();
       error.code = STATUS_CODES.InternalServerError;
-      console.log(error);
-      throw error;      
+      throw error;     
     }
   },
   createService: async (name, description, rating, address, phoneNumber, serviceTypeId) => {
@@ -232,8 +231,7 @@ module.exports = {
     } catch (error) {
       await transaction.rollback();
       error.code = STATUS_CODES.InternalServerError;
-      console.log(error);
-      throw error;      
+      throw error;     
     }
   },
   getRelatedService: async (id, serviceTypeId, limit = 5) => {
@@ -250,8 +248,8 @@ module.exports = {
       });
       return service;
     } catch (error) {
-      console.log(error)
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;
     }
   },
 }

@@ -27,8 +27,8 @@ module.exports = {
       })
       return review;
     } catch (error) {
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;
     }
   },
   getTotalRatingByServiceId: async (serviceId) => {
@@ -50,8 +50,8 @@ module.exports = {
       })
       return data[0];
     } catch (error) {
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;
     }
   },
   getTotalRatingByServiceIdExcludeOne: async (serviceId, reviewId) => {
@@ -73,8 +73,8 @@ module.exports = {
       })
       return data[0];
     } catch (error) {
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;
     }
   },
   createReview: async (userId, serviceId, rating, description = null, trx) => {
@@ -99,8 +99,8 @@ module.exports = {
       return review;
     } catch (error) {
       await transaction.rollback();
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;
     }
   },
   updateReview: async (reviewId, userId, serviceId, rating, description = null, trx) => {
@@ -129,8 +129,8 @@ module.exports = {
       return newReview;
     } catch (error) {
       await transaction.rollback();
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;
     }
   },
   deleteReview: async (reviewId, trx) => {
@@ -152,8 +152,8 @@ module.exports = {
       return newReview;
     } catch (error) {
       await transaction.rollback();
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;
     }
   },
 }
