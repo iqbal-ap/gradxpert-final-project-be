@@ -61,12 +61,17 @@ module.exports = {
   },
   updateServiceById: async (id, name, description, rating, address, phoneNumber, serviceTypeId, transaction = null) => {
     try {
+      const service = await ServiceRepository.getServiceById(id);
+      if (!service) {
+        throw new ERROR.NotFoundError(ERROR_MSG.SERVICE_NOT_FOUND);
+      }
+      
       const serviceType = await ServiceTypeServices.getServiceTypeById(serviceTypeId);
       if (!serviceType) {
         throw new ERROR.NotFoundError(ERROR_MSG.SERVICE_TYPE_NOT_FOUND);
       }
-      const service = await ServiceRepository.updateServiceById(id, name, description, rating, address, phoneNumber, serviceTypeId, transaction);
-      return service;
+      const newService = await ServiceRepository.updateServiceById(id, name, description, rating, address, phoneNumber, serviceTypeId, transaction);
+      return newService;
     } catch (error) {
       throw error;
     }
@@ -86,6 +91,10 @@ module.exports = {
   getRelatedService: async (id) => {
     try {
       const service = await ServiceRepository.getServiceById(id);
+      if (!service) {
+        throw new ERROR.NotFoundError(ERROR_MSG.SERVICE_NOT_FOUND);
+      }
+
       const { serviceTypeId } = service;
       const relatedServices = await ServiceRepository.getRelatedService(id, serviceTypeId);
       return relatedServices;

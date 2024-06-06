@@ -78,8 +78,9 @@ module.exports = {
             deletedAt: null,
           },
           transaction,
+          returning: true,
         },
-      )
+      ).then(res => res[1][0]);
       await transaction.commit();
       return serviceType;
     } catch (error) {

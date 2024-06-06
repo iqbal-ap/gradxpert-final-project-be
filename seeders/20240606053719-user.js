@@ -26,6 +26,16 @@ module.exports = {
         pivotImgId: 16,
         createdAt: new Date(),
         updatedAt: new Date(),
+      },
+      {
+        username: 'ordinary-user',
+        password: await bycrpt.hash(process.env.ADMIN_PASSWORD_2, Number(process.env.SALT)),
+        email: 'ordinary-user@gmail.com',
+        phoneNumber: process.env.ADMIN_PHONE_NUMBER_2,
+        role: 'user',
+        pivotImgId: 16,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
     ])
   },

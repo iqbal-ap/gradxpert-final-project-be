@@ -105,7 +105,7 @@ module.exports = {
     try {
       const data = await ServiceServices.createService(name, description, rating, address, phoneNumber, serviceTypeId);
       responseSuccess(res, {
-        code: STATUS_CODES.OK,
+        code: STATUS_CODES.Created,
         message: STATUS_TEXT[STATUS_CODES.OK],
         data,
       });

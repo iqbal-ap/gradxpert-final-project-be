@@ -127,6 +127,7 @@ router.get(
 );
 router.get(
   '/service-types/:id',
+  AuthMiddleware.validateUserToken,
   ServiceTypeMiddleware.validateGetServiceTypeById,
   ServiceTypeController.getServiceTypeById,
 );

@@ -50,7 +50,7 @@ module.exports = {
     try {
       const data = await ServiceTypeServices.createServiceType(name);
       responseSuccess(res, {
-        code: STATUS_CODES.OK,
+        code: STATUS_CODES.Created,
         message: STATUS_TEXT[STATUS_CODES.OK],
         data,
       });

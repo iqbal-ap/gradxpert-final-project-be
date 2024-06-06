@@ -9,6 +9,9 @@ module.exports = {
   getReviewById: async (id) => {
     try {
       const review = await ReviewRepository.getReviewById(id);
+      if (!review) {
+        throw new ERROR.NotFoundError(ERROR_MSG.REVIEW_NOT_FOUND);
+      }
       return review;
     } catch (error) {
       throw error;
