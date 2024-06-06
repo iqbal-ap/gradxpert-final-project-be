@@ -51,7 +51,7 @@ module.exports = {
         .integer()
         .min(1)
         .required(),
-        page: joi
+      page: joi
         .number()
         .integer()
         .min(1)
@@ -89,7 +89,7 @@ module.exports = {
     }
     next()
   },
-  validateGetRelatedService: async (req, res, next) => {
+  validateParamServiceId: async (req, res, next) => {
     const validationSchema = joi.object({
       id: joi
         .number()
@@ -98,6 +98,98 @@ module.exports = {
         .required(),
     });
     const validationResult = validationSchema.validate(req.params);
+    if (validationResult.error) {
+      console.log(new ERROR.BadRequestError(validationResult.error.message))
+      return responseError(res, {
+        code: STATUS_CODES.BadRequest,
+        message: validationResult.error.message,
+      });
+    }
+    next()
+  },
+  validateUpdateServiceById: async (req, res, next) => {
+    const validationSchema = joi.object({
+      id: joi
+        .number()
+        .integer()
+        .min(1)
+        .required(),
+      name: joi
+        .string()
+        .min(1)
+        .required(),
+      description: joi
+        .string()
+        .optional()
+        .allow('', null)
+        .default(null),
+      rating: joi
+        .number()
+        .min(0)
+        .max(5)
+        .required(),
+      address: joi
+        .string()
+        .allow('', null)
+        .default(null),
+      phoneNumber: joi
+        .string()
+        .optional()
+        .allow('', null)
+        .default(null),
+      serviceTypeId: joi
+        .number()
+        .integer()
+        .min(1)
+        .required()
+    });
+    const validationResult = validationSchema.validate({
+      id: req.params.id,
+      ...req.body
+    });
+    if (validationResult.error) {
+      console.log(new ERROR.BadRequestError(validationResult.error.message))
+      return responseError(res, {
+        code: STATUS_CODES.BadRequest,
+        message: validationResult.error.message,
+      });
+    }
+    next()
+  },
+  validateCreateService: async (req, res, next) => {
+    const validationSchema = joi.object({
+      name: joi
+        .string()
+        .min(1)
+        .required(),
+      description: joi
+        .string()
+        .optional()
+        .allow('', null)
+        .default(null),
+      rating: joi
+        .number()
+        .min(0)
+        .max(5)
+        .optional()
+        .allow(null)
+        .default(0),
+      address: joi
+        .string()
+        .allow('', null)
+        .default(null),
+      phoneNumber: joi
+        .string()
+        .optional()
+        .allow('', null)
+        .default(null),
+      serviceTypeId: joi
+        .number()
+        .integer()
+        .min(1)
+        .required()
+    });
+    const validationResult = validationSchema.validate(req.body);
     if (validationResult.error) {
       console.log(new ERROR.BadRequestError(validationResult.error.message))
       return responseError(res, {

@@ -46,4 +46,18 @@ module.exports = {
       responseError(res, error);
     }
   },
+  getReviewById: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const data = await ReviewServices.getReviewById(id);
+      responseSuccess(res, {
+        code: STATUS_CODES.OK,
+        message: 'Successfully get data',
+        data,
+      })
+    } catch (error) {
+      console.log(error);
+      responseError(res, error);
+    }
+  },
 }

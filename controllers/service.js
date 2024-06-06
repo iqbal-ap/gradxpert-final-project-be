@@ -69,7 +69,63 @@ module.exports = {
     } catch (error) {
       console.log(error);
       responseError(res, error);
-      
     }
-  }
+  },
+  updateServiceById: async (req, res) => {
+    const { id } = req.params;
+    const { 
+      name,
+      description, 
+      address, 
+      rating, 
+      serviceTypeId,
+      phoneNumber,
+    } = req.body;
+    try {
+      const data = await ServiceServices.updateServiceById(id, name, description, rating, address, phoneNumber, serviceTypeId);
+      responseSuccess(res, {
+        code: STATUS_CODES.OK,
+        message: STATUS_TEXT[STATUS_CODES.OK],
+        data,
+      });
+    } catch (error) {
+      console.log(error);
+      responseError(res, error);
+    }
+  },
+  createService: async (req, res) => {
+    const { 
+      name,
+      description, 
+      address,
+      serviceTypeId,
+      phoneNumber,
+    } = req.body;
+    const rating = req.body?.rating ? req.body?.rating : 0;
+    try {
+      const data = await ServiceServices.createService(name, description, rating, address, phoneNumber, serviceTypeId);
+      responseSuccess(res, {
+        code: STATUS_CODES.OK,
+        message: STATUS_TEXT[STATUS_CODES.OK],
+        data,
+      });
+    } catch (error) {
+      console.log(error);
+      responseError(res, error);
+    }
+  },
+  deleteServiceById: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const data = await ServiceServices.deleteServiceById(id);
+      responseSuccess(res, {
+        code: STATUS_CODES.OK,
+        message: STATUS_TEXT[STATUS_CODES.OK],
+        data,
+      });
+    } catch (error) {
+      console.log(error);
+      responseError(res, error);
+    }
+  },
 }

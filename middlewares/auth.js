@@ -63,7 +63,7 @@ module.exports = {
     try {
       const token = req.headers?.authorization?.split(' ')[1];
       if (!token) {
-        throw ERROR.UNAUTHORIZED;
+        throw new ERROR.UnauthorizedError();
       }
       const user = await AuthServices.authorize(token);
       req.user = user;
@@ -72,5 +72,20 @@ module.exports = {
       console.log(error);
       responseError(res, error);
     }
-  }
+  },
+  validateAdminRole: async (req, res, next) => {
+    try {
+      const { user } = req;
+      if (!user) {
+        throw new ERROR.NotFoundError('User not found');
+      }
+      if (user.role !== 'admin') {
+        throw new ERROR.UnauthorizedError();
+      }
+      next();
+    } catch (error) {
+      console.log(error);
+      responseError(res, error);
+    }
+  },
 }

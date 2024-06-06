@@ -50,5 +50,46 @@ module.exports = {
       });
     }
     next()
-  }
+  },
+  validateGetUserById: async (req, res, next) => {
+    const validationSchema = joi.object({
+      id: joi
+        .number()
+        .integer()
+        .min(1)
+        .required(),
+    });
+    const validationResult = validationSchema.validate(req.params);
+    if (validationResult.error) {
+      const { error } = validationResult;
+      error.code = STATUS_CODES.BadRequest;
+      return responseError(res, error);
+    }
+    next()
+  },
+  validateUpdateUserParams: async (req, res, next) => {
+    const validationSchema = joi.object({
+      username: joi
+        .string()
+        .min(1)
+        .required(),
+      email: joi
+        .string()
+        .email()
+        .required(),
+      phoneNumber: joi
+        .string()
+        .optional()
+        .allow('', null)
+        .default('') 
+    });
+    const validationResult = validationSchema.validate(req.body)
+    if (validationResult.error) {
+      const { error } = validationResult;
+      error.code = STATUS_CODES.BadRequest;
+      console.log(error)
+      return responseError(res, error);
+    }
+    next()
+  },
 }

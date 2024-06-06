@@ -53,25 +53,6 @@ module.exports = {
       throw error;
     }
   },
-  // getListServices: async (limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', whereClauses = [{ deletedAt: null }]) => {
-  //   try {
-  //     const services = await models.service.findAll({
-  //       where: { [models.Sequelize.Op.and]: whereClauses },
-  //       limit,
-  //       offset,
-  //       order: [[sortBy, sortingMethod]],
-  //       include: [{
-  //         model: models.serviceType,
-  //         attributes: ['id', 'name'],
-  //         where: { deletedAt: null },
-  //       }],
-  //     });
-  //     return services;
-  //   } catch (error) {
-  //     console.log(error)
-  //     throw ERROR.INTERNAL_SERVER_ERROR;
-  //   }
-  // },
   getServiceByIdWithCount: async (id, limit = 10, offset = 0, sorting = 'r.id asc', whereClauses = '') => {
     try {
       const service = await models.DbConnection.query(`
@@ -158,34 +139,13 @@ module.exports = {
       throw error;
     }
   },
-  getServiceById: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', whereReviewClauses = [{ deletedAt: null }]) => {
+  getServiceById: async (id) => {
     try {
       const service = await models.service.findOne({
         where: {
           id,
           deletedAt: null,
         },
-        // include: [
-        //   {
-        //     model: models.serviceType,
-        //     attributes: ['id', 'name'],
-        //     where: { deletedAt: null },
-        //   },
-        //   {
-        //     model: models.review,
-        //     where: { [models.Sequelize.Op.and]: whereReviewClauses },
-        //     required: false,
-        //     limit,
-        //     offset,
-        //     order: [[sortBy, sortingMethod]],
-        //     include: [{
-        //       model: models.user,
-        //       required: false,
-        //       attributes: ['id', 'username', 'email'],
-        //       where: { deletedAt: null }
-        //     }],
-        //   },
-        // ],
       });
       return service;
     } catch (error) {
@@ -211,9 +171,10 @@ module.exports = {
             id,
             deletedAt: null,
           },
-          transaction
+          transaction,
+          returning: true,
         },
-      );
+      ).then((res) => res[1][0]);
       if (trx) return service;
       await transaction.commit();
       return service;
@@ -221,6 +182,58 @@ module.exports = {
       await transaction.rollback();
       console.log(error);
       throw ERROR.INTERNAL_SERVER_ERROR;      
+    }
+  },
+  deleteServiceById: async (id) => {
+    const transaction = await models.DbConnection.transaction({});
+    try {
+      const service = await models.service.update(
+        {
+          deletedAt: new Date(),
+        },
+        { 
+          where: {
+            id,
+            deletedAt: null,
+          },
+          transaction,
+          returning: true,
+        },
+      ).then((res) => res[1][0]);
+      await transaction.commit();
+      return service;
+    } catch (error) {
+      await transaction.rollback();
+      error.code = STATUS_CODES.InternalServerError;
+      console.log(error);
+      throw error;      
+    }
+  },
+  createService: async (name, description, rating, address, phoneNumber, serviceTypeId) => {
+    const transaction = await models.DbConnection.transaction({});
+    try {
+      const service = await models.service.create(
+        {
+          name, 
+          description,
+          rating,
+          address,
+          phoneNumber,
+          serviceTypeId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          transaction,
+        },
+      )
+      await transaction.commit();
+      return service;
+    } catch (error) {
+      await transaction.rollback();
+      error.code = STATUS_CODES.InternalServerError;
+      console.log(error);
+      throw error;      
     }
   },
   getRelatedService: async (id, serviceTypeId, limit = 5) => {

@@ -1,4 +1,5 @@
 const models = require('../models/index');
+const ServiceTypeServices = require('./serviceType');
 const { ServiceRepository } = require('../repositories/index');
 const ERROR = require('../helper/error');
 
@@ -57,9 +58,25 @@ module.exports = {
       throw error;
     }
   },
-  updateServiceById: async (id, name, description, rating, address, phoneNumber, serviceTypeId, transaction) => {
+  updateServiceById: async (id, name, description, rating, address, phoneNumber, serviceTypeId, transaction = null) => {
     try {
+      const serviceType = await ServiceTypeServices.getServiceTypeById(serviceTypeId);
+      if (!serviceType) {
+        throw new ERROR.NotFoundError('Service type not found');
+      }
       const service = await ServiceRepository.updateServiceById(id, name, description, rating, address, phoneNumber, serviceTypeId, transaction);
+      return service;
+    } catch (error) {
+      throw error;
+    }
+  },
+  createService: async (name, description, rating = 0, address, phoneNumber, serviceTypeId) => {
+    try {
+      const serviceType = await ServiceTypeServices.getServiceTypeById(serviceTypeId);
+      if (!serviceType) {
+        throw new ERROR.NotFoundError('Service type not found');
+      }
+      const service = await ServiceRepository.createService(name, description, rating, address, phoneNumber, serviceTypeId);
       return service;
     } catch (error) {
       throw error;
@@ -71,6 +88,18 @@ module.exports = {
       const { serviceTypeId } = service;
       const relatedServices = await ServiceRepository.getRelatedService(id, serviceTypeId);
       return relatedServices;
+    } catch (error) {
+      throw error;
+    }
+  },
+  deleteServiceById: async (id) => {
+    try {
+      const service = await ServiceRepository.getServiceById(id);
+      if (!service) {
+        throw new ERROR.NotFoundError('Service not found');
+      }
+      const deletedService = await ServiceRepository.deleteServiceById(id);
+      return deletedService;
     } catch (error) {
       throw error;
     }

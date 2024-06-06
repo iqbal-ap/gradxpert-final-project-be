@@ -1,5 +1,6 @@
 const { UserRepository } = require('../repositories/index');
 const ERROR = require('../helper/error');
+const ERROR_MSG = require('../helper/customErrorMsgs');
 const models = require('../models');
 
 module.exports = {
@@ -11,18 +12,54 @@ module.exports = {
       throw error
     }
   },
-  getUser: async (username, email) => {
+  updateUserById: async (id, username, email, password, phoneNumber) => {
     try {
-      const filterObj = {
-        email,
-        deletedAt: null,
-      };
-      
+      const scope = 'nonAuth';
+      const user = await UserRepository.getUser({ id, deletedAt: null }, scope);
+      if (!user) {
+        throw new ERROR.NotFoundError(ERROR_MSG.USER_NOT_FOUND);
+      }
+      const newUser = await UserRepository.updateUserById(id, username, email, phoneNumber);
+      return newUser;
+    } catch (error) {
+      throw error
+    }
+  },
+  deleteUserById: async (id) => {
+    try {
+      const scope = 'nonAuth';
+      const user = await UserRepository.getUser({ id, deletedAt: null }, scope);
+      if (!user) {
+        throw new ERROR.NotFoundError(ERROR_MSG.USER_NOT_FOUND);
+      }
+      const newUser = await UserRepository.deleteUserById(id);
+      return newUser;
+    } catch (error) {
+      throw error
+    }
+  },
+  getUser: async (username, email, id = 0) => {
+    try {
+      const filterObj = { deletedAt: null };
+
+      let scope = 'auth';
+      if (email) {
+        filterObj.email = email;
+      }
+
       if (username) {
         filterObj.username = username;
       }
       
-      const user = await UserRepository.getUser(filterObj);
+      if (id) {
+        filterObj.id = id;
+        scope = 'nonAuth';
+      }
+      
+      const user = await UserRepository.getUser(filterObj, scope);
+      if (!user) {
+        throw new ERROR.NotFoundError(ERROR_MSG.USER_NOT_FOUND);
+      }
       return user;
     } catch (error) {
       throw error;

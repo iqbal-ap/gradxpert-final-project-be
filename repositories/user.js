@@ -24,15 +24,78 @@ module.exports = {
       console.log(error)
     }
   },
-  getUser: async (filterObj) => {
+  updateUserById: async (id, username, email, phoneNumber) => {
+    const transaction = await models.DbConnection.transaction({});
+    try {
+      const user = await models.user.scope('nonAuth').update(
+        {
+          username,
+          email,
+          phoneNumber,
+          updatedAt: new Date(),
+        },
+        {
+          where: {
+            id,
+            deletedAt: null,
+          },
+          transaction,
+          returning: true,
+        },
+      )
+        .then((res) => {
+          const response = res[1][0].dataValues;
+          const { password, ...otherData } = response;
+          return otherData;
+        })
+      await transaction.commit()
+      return user;
+    } catch (error) {
+      await transaction.rollback();
+      error.code = STATUS_CODES.InternalServerError;
+      console.log(error)
+      throw error;
+    }
+  },
+  deleteUserById: async (id) => {
+    const transaction = await models.DbConnection.transaction({});
+    try {
+      const user = await models.user.scope('nonAuth').update(
+        {
+          deletedAt: new Date(),
+        },
+        {
+          where: {
+            id,
+            deletedAt: null,
+          },
+          transaction,
+          returning: true,
+        },
+      )
+        .then((res) => {
+          const response = res[1][0].dataValues;
+          const { password, ...otherData } = response;
+          return otherData;
+        })
+      await transaction.commit()
+      return user;
+    } catch (error) {
+      await transaction.rollback();
+      error.code = STATUS_CODES.InternalServerError;
+      console.log(error)
+      throw error;
+    }
+  },
+  getUser: async (filterObj, scope = 'abc') => {
     try {      
-      const user = await models.user.findOne({
+      const user = await models.user.scope(scope).findOne({
         where: filterObj,
       });
       return user;
     } catch (error) {
-      console.log(error)
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;
     }
   },
   getListUser: async (username, email, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc') => {
@@ -131,36 +194,4 @@ module.exports = {
       throw error;
     }
   },
-  // getReviewHistoryByUserId: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', whereClauses = [{ deletedAt: null }]) => {
-  //   try {
-  //     const data = models.user.findOne({
-  //       attributes: ['id', 'username', 'email'],
-  //       where: {
-  //         id,
-  //         deletedAt: null,
-  //       },
-  //       include: [
-  //         {
-  //           model: models.review,
-  //           where: { [models.Sequelize.Op.and]: whereClauses },
-  //           limit,
-  //           offset,
-  //           order: [[sortBy, sortingMethod]],
-  //           required: false,
-  //           include: [
-  //             {
-  //               model: models.service,
-  //               attributes: ['id', 'name', 'rating', 'description'],
-  //               where: { deletedAt: null },
-  //             }
-  //           ]
-  //         }          
-  //       ],
-  //     })
-  //     return data;
-  //   } catch (error) {
-  //     console.log(error);
-  //     throw ERROR.INTERNAL_SERVER_ERROR;
-  //   }
-  // }
 }

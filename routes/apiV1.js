@@ -5,6 +5,7 @@ const {
   ServiceMiddleware,
   ReviewMiddleware,
   UserMiddleware,
+  ServiceTypeMiddleware,
 } = require('../middlewares/index');
 const {
   AuthController,
@@ -24,24 +25,45 @@ router.post(
   '/register',
   AuthMiddleware.validateRegisterParams,
   AuthController.register,
-)
+);
 
 // * Service Feature
 router.get(
   '/services',
   ServiceMiddleware.validateGetListParams,
   ServiceController.getListServices
-)
+);
 router.get(
   '/services/:id',
   ServiceMiddleware.validateGetById,
   ServiceController.getServiceById
-)
+);
 router.get(
   '/services/:id/related',
-  ServiceMiddleware.validateGetRelatedService,
+  ServiceMiddleware.validateParamServiceId,
   ServiceController.getRelatedService
-)
+);
+router.put(
+  '/services/:id',
+  AuthMiddleware.validateUserToken,
+  AuthMiddleware.validateAdminRole,
+  ServiceMiddleware.validateUpdateServiceById,
+  ServiceController.updateServiceById,
+);
+router.post(
+  '/services',
+  AuthMiddleware.validateUserToken,
+  AuthMiddleware.validateAdminRole,
+  ServiceMiddleware.validateCreateService,
+  ServiceController.createService,
+);
+router.delete(
+  '/services/:id',
+  AuthMiddleware.validateUserToken,
+  AuthMiddleware.validateAdminRole,
+  ServiceMiddleware.validateParamServiceId,
+  ServiceController.deleteServiceById,
+);
 
 // * Review Feature
 router.post(
@@ -55,13 +77,19 @@ router.put(
   AuthMiddleware.validateUserToken,
   ReviewMiddleware.validateUpdateReviewParams,
   ReviewController.updateReview,
-)
+);
 router.delete(
   '/reviews/:id',
   AuthMiddleware.validateUserToken,
-  ReviewMiddleware.validateDeleteReviewParams,
+  ReviewMiddleware.validateParamReviewId,
   ReviewController.deleteReview,
-)
+);
+router.get(
+  '/reviews/:id',
+  AuthMiddleware.validateUserToken,
+  ReviewMiddleware.validateParamReviewId,
+  ReviewController.getReviewById,
+);
 
 // * User Feature
 router.get(
@@ -69,11 +97,59 @@ router.get(
   AuthMiddleware.validateUserToken,
   UserMiddleware.validateGetReviewHistoryParams,
   UserController.getReviewHistoryByUserId
-)
+);
+router.delete(
+  '/users/:id',
+  AuthMiddleware.validateUserToken,
+  AuthMiddleware.validateAdminRole,
+  UserMiddleware.validateGetUserById,
+  UserController.deleteUserById,
+);
+router.put(
+  '/users/:id',
+  AuthMiddleware.validateUserToken,
+  AuthMiddleware.validateAdminRole,
+  UserMiddleware.validateUpdateUserParams,
+  UserController.updateUserById,
+);
+router.get(
+  '/users/:id',
+  AuthMiddleware.validateUserToken,
+  UserMiddleware.validateGetUserById,
+  UserController.getUserById,
+);
+// * Create user already done when register
 
 // * Service Type Feature
 router.get(
   '/service-types/select',
   ServiceTypeController.getSelectListServiceTypes
-)
+);
+router.get(
+  '/service-types/:id',
+  ServiceTypeMiddleware.validateGetServiceTypeById,
+  ServiceTypeController.getServiceTypeById,
+);
+router.put(
+  '/service-types/:id',
+  AuthMiddleware.validateUserToken,
+  AuthMiddleware.validateAdminRole,
+  ServiceTypeMiddleware.validateUpdateParams,
+  ServiceTypeController.updateServiceTypeById,
+);
+router.post(
+  '/service-types',
+  AuthMiddleware.validateUserToken,
+  AuthMiddleware.validateAdminRole,
+  ServiceTypeMiddleware.validateCreateParams,
+  ServiceTypeController.createServiceType,
+);
+router.delete(
+  '/service-types/:id',
+  AuthMiddleware.validateUserToken,
+  AuthMiddleware.validateAdminRole,
+  ServiceTypeMiddleware.validateGetServiceTypeById,
+  ServiceTypeController.deleteServiceTypeById,
+);
+
 module.exports = router;

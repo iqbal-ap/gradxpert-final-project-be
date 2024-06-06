@@ -11,12 +11,6 @@ class BadRequestError extends Error {
     this.code = STATUS_CODES.BadRequest;
   }
 }
-class InternalServerError extends Error {
-  constructor(message = STATUS_TEXT[STATUS_CODES.INTERNAL_SERVER_ERROR]) {
-    super(message);
-    this.code = STATUS_CODES.InternalServerError;
-  }
-}
 class UnauthorizedError extends Error {
   constructor(message = STATUS_TEXT[STATUS_CODES.Unauthorized]) {
     super(message);
@@ -27,7 +21,6 @@ class UnauthorizedError extends Error {
 module.exports = {
   NotFoundError,
   BadRequestError,
-  InternalServerError,
   UnauthorizedError,
   USER_NOT_FOUND: {
     code: STATUS_CODES.NotFound,

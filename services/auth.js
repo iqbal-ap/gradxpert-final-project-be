@@ -3,19 +3,20 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const UserServices = require('./user');
 const ERROR = require('../helper/error');
+const ERROR_MSG = require('../helper/customErrorMsgs');
 
 module.exports = {
   authenticate: async (username, email, password) => {
     try {
       const user = await UserServices.getUser(username, email);
       if (!user) {
-        throw ERROR.USER_NOT_FOUND;
+        throw new ERROR.NotFoundError(ERROR_MSG.USER_NOT_FOUND);
       }
 
       // Encrypt Password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        throw ERROR.INVALID_USERNAME_PASSWORD;
+        throw new ERROR.BAD_REQUEST(ERROR_MSG.INVALID_USERNAME_PASSWORD);
       }
 
       // Generate Token
@@ -40,10 +41,10 @@ module.exports = {
       const decoded = jwt.decode(token, process.env.JWT_SECRET_KEY);
       const user = await UserServices.getUser(decoded.username, decoded.email);
       if (!user) {
-        throw ERROR.USER_NOT_FOUND;
+        throw new ERROR.NotFoundError(ERROR_MSG.USER_NOT_FOUND);
       }
       if (user.id !== decoded.id) {
-        throw ERROR.UNAUTHORIZED;
+        throw new ERROR.UnauthorizedError();
       }
       return user;
     } catch (error) {
@@ -54,7 +55,7 @@ module.exports = {
     try {
       const users = await UserServices.getListUser(username, email);
       if (users.length > 0) {
-        throw ERROR.USER_ALREADY_EXISTS;
+        throw new ERROR.BadRequestError(ERROR_MSG.USER_ALREADY_EXISTS);
       }
 
       // Encrypt Password

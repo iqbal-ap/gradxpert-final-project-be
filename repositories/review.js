@@ -1,5 +1,6 @@
 const models = require('../models/index');
 const ERROR = require('../helper/error');
+const { STATUS_CODES } = require('../helper/httpStatusCodes');
 
 module.exports = {
   getReviewById: async (id) => {
@@ -12,8 +13,8 @@ module.exports = {
       })
       return review;
     } catch (error) {
-      console.log(error);
-      throw ERROR.INTERNAL_SERVER_ERROR;
+      error.code = STATUS_CODES.InternalServerError;
+      throw error;
     }
   },
   getReviewByServiceId: async (serviceId) => {

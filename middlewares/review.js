@@ -1,6 +1,7 @@
 const joi = require('joi');
 const { responseError } = require('../helper/output');
 const { STATUS_CODES } = require('../helper/httpStatusCodes');
+const ERROR = require('../helper/error');
 
 module.exports = {
   validateCreateReviewParams: async (req, res, next) => {
@@ -77,7 +78,7 @@ module.exports = {
     }
     next();
   },
-  validateDeleteReviewParams: async (req, res, next) => {
+  validateParamReviewId: async (req, res, next) => {
     const validationSchema = joi.object({
       id: joi
         .number()
@@ -87,11 +88,9 @@ module.exports = {
     });
     const validationResult = validationSchema.validate(req.params);
     if (validationResult.error) {
-      console.log(validationResult.error.message)
-      return responseError(res, {
-        code: STATUS_CODES.BadRequest,
-        message: validationResult.error.message,
-      });
+      const { error } = validationResult;
+      error.code = STATUS_CODES.BadRequest;
+      return responseError(res, error);
     }
     next();
   },
