@@ -13,6 +13,7 @@ module.exports = {
         email: process.env.ADMIN_EMAIL_1,
         phoneNumber: process.env.ADMIN_PHONE_NUMBER_1,
         role: 'admin',
+        pivotImgId: 16,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -22,6 +23,7 @@ module.exports = {
         email: process.env.ADMIN_EMAIL_2,
         phoneNumber: process.env.ADMIN_PHONE_NUMBER_2,
         role: 'admin',
+        pivotImgId: 16,
         createdAt: new Date(),
         updatedAt: new Date(),
       }

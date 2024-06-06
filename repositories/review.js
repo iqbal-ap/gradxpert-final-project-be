@@ -120,9 +120,11 @@ module.exports = {
             id: reviewId,
             deletedAt: null,
           },
-          transaction
+          transaction,
+          returning: true,
         },
-      );
+      )
+      .then(res => res[1][0]);
 
       if (trx) return newReview;
       await transaction.commit();
@@ -143,9 +145,10 @@ module.exports = {
             id: reviewId,
             deletedAt: null,
           },
-          transaction
+          transaction,
+          returning: true,
         },
-      );
+      ).then(res => res[1][0]);
 
       if (trx) return newReview;
       await transaction.commit();

@@ -42,6 +42,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       allowNull: false,
     },
+    pivotImgId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,

@@ -3,6 +3,7 @@ const { ReviewRepository } = require('../repositories/index');
 const ERROR = require('../helper/error');
 const ServiceServices = require('./service');
 const ERROR_MSG = require('../helper/customErrorMsgs');
+const UserServices = require('./user');
 
 module.exports = {
   getReviewById: async (id) => {
@@ -40,6 +41,12 @@ module.exports = {
   createReview: async (userId, serviceId, rating, description = null) => {
     const transaction = await models.DbConnection.transaction({});
     try {
+      // * Check whether User exists
+      const user = await UserServices.getUser('', '', userId);
+      if (!user) {
+        throw new ERROR.NotFoundError(ERROR_MSG.USER_NOT_FOUND);
+      }
+
       // * Check whether service exists
       const service = await ServiceServices.getServiceById(serviceId);
       if (!service) {
@@ -85,6 +92,12 @@ module.exports = {
         throw new ERROR.NotFoundError(ERROR_MSG.REVIEW_NOT_FOUND);
       }
 
+      // * Check whether User exists
+      const user = await UserServices.getUser('', '', userId);
+      if (!user) {
+        throw new ERROR.NotFoundError(ERROR_MSG.USER_NOT_FOUND);
+      }
+
       // * Check whether service exists
       const service = await ServiceServices.getServiceById(serviceId);
       if (!service) {
@@ -92,7 +105,7 @@ module.exports = {
       }
 
       // * Update review
-      await ReviewRepository.updateReview(reviewId, userId, serviceId, rating, description, transaction);
+      const newReview = await ReviewRepository.updateReview(reviewId, userId, serviceId, rating, description, transaction);
 
       // * Update related service's rating
       const { total, numOfReview } = await ReviewRepository.getTotalRatingByServiceIdExcludeOne(serviceId, reviewId);
@@ -110,7 +123,7 @@ module.exports = {
       );
 
       // * Get new review
-      const newReview = await ReviewRepository.getReviewById(reviewId);
+      // const newReview = await ReviewRepository.getReviewById(reviewId);
       await transaction.commit();
       return newReview;
     } catch (error) {

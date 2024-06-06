@@ -14,8 +14,17 @@ module.exports = {
   },
   updateUserById: async (id, username, email, password, phoneNumber) => {
     try {
-      const scope = 'nonAuth';
-      const user = await UserRepository.getUser({ id, deletedAt: null }, scope);
+      const whereList = ['u."deletedAt" is null'];
+      const replacementsObj = {};
+      let password = 'u.password, ';
+      
+      if (id) {
+        replacementsObj.id = id;
+        whereList.push('u.id = :id')
+        password = ''
+      }
+      const whereClauses = whereList.join(' and ').toString();
+      const user = await UserRepository.getUser(whereClauses, replacementsObj, password);
       if (!user) {
         throw new ERROR.NotFoundError(ERROR_MSG.USER_NOT_FOUND);
       }
@@ -27,8 +36,17 @@ module.exports = {
   },
   deleteUserById: async (id) => {
     try {
-      const scope = 'nonAuth';
-      const user = await UserRepository.getUser({ id, deletedAt: null }, scope);
+      const whereList = ['u."deletedAt" is null'];
+      const replacementsObj = {};
+      let password = 'u.password, ';
+      
+      if (id) {
+        replacementsObj.id = id;
+        whereList.push('u.id = :id')
+        password = ''
+      }
+      const whereClauses = whereList.join(' and ').toString();
+      const user = await UserRepository.getUser(whereClauses, replacementsObj, password);
       if (!user) {
         throw new ERROR.NotFoundError(ERROR_MSG.USER_NOT_FOUND);
       }
@@ -40,23 +58,28 @@ module.exports = {
   },
   getUser: async (username, email, id = 0) => {
     try {
-      const filterObj = { deletedAt: null };
+      const whereList = ['u."deletedAt" is null'];
+      const replacementsObj = {};
+      let password = 'u.password, ';
 
-      let scope = 'auth';
       if (email) {
-        filterObj.email = email;
+        replacementsObj.email = email;
+        whereList.push('u.email = :email');
       }
 
       if (username) {
-        filterObj.username = username;
+        replacementsObj.username = username;
+        whereList.push('u.username = :username')
       }
       
       if (id) {
-        filterObj.id = id;
-        scope = 'nonAuth';
+        replacementsObj.id = id;
+        whereList.push('u.id = :id')
+        password = ''
       }
       
-      const user = await UserRepository.getUser(filterObj, scope);
+      const whereClauses = whereList.join(' and ').toString();
+      const user = await UserRepository.getUser(whereClauses, replacementsObj, password);
       if (!user) {
         throw new ERROR.NotFoundError(ERROR_MSG.USER_NOT_FOUND);
       }
@@ -75,6 +98,21 @@ module.exports = {
   },
   getReviewHistoryByUserId: async (id, limit = 10, offset = 0, sortBy = 'id', sortingMethod = 'asc', keyword = '', serviceId = 0) => {
     try {
+      const userWhereList = ['u."deletedAt" is null'];
+      const replacementsObj = {};
+      let password = 'u.password, ';
+      
+      if (id) {
+        replacementsObj.id = id;
+        userWhereList.push('u.id = :id')
+        password = ''
+      }
+      const userWhereClauses = userWhereList.join(' and ').toString();
+      const user = await UserRepository.getUser(userWhereClauses, replacementsObj, password);
+      if (!user) {
+        throw new ERROR.NotFoundError(ERROR_MSG.USER_NOT_FOUND);
+      }
+
       const whereList = [
         'r."deletedAt" is null',
         's."deletedAt" is null',

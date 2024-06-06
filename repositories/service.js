@@ -13,13 +13,18 @@ module.exports = {
             'id', st.id,
             'name', st.name
           ) "serviceType",
+          i.url "imageUrl",
           1 as join_key
         from services s
         join "serviceTypes" st ON st.id = s."serviceTypeId" 
+        left join "pivotImages" pi2 on s."pivotImgId" = pi2."pivotImgId" 
+        join images i 
+          on i.id = pi2."imageId"
+          and i."isMainImg" = true 
         where 
           ${whereClauses}
           and st."deletedAt" is null
-        group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+        group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
         order by ${sorting}
         limit :limit
         offset :offset
@@ -63,25 +68,40 @@ module.exports = {
               'id', st.id,
               'name', st.name
             ) "serviceType",
+            jsonb_agg(
+            	jsonb_build_object(
+	              'id', i.id,
+	              'imageUrl', i.url,
+	              'isMainImg', i."isMainImg"
+	            )
+            ) images,
             1 as join_key
           from services s 
           join "serviceTypes" st 
-            on st.id = s."serviceTypeId" 
+            on st.id = s."serviceTypeId"
+          left join "pivotImages" pi2 on s."pivotImgId" = pi2."pivotImgId" 
+          join images i on i.id = pi2."imageId" 
           where
             s.id = :id
             and s."deletedAt" is null
             and st."deletedAt" is null
+          group by 
+          	s.id,
+          	st.id
         ), review_data as (
           select 
             r.*,
             jsonb_build_object(
               'id', u.id,
               'username', u.username,
-              'email', u.email 
+              'email', u.email,
+              'imageUrl', i.url
             ) as user
           from reviews r
           join service_data sd on sd.id = r."serviceId"
           join users u on r."userId" = u.id 
+          left join "pivotImages" pi2 on u."pivotImgId" = pi2."pivotImgId" 
+          join images i on i.id = pi2."imageId" 
           where
             ${whereClauses}
             and u."deletedAt" is null
@@ -114,6 +134,7 @@ module.exports = {
             'rating', sd.rating,
             'address', sd.address,
             'phoneNumber', sd."phoneNumber",
+            'images', sd."images",
             'serviceTypeId', sd."serviceTypeId",
             'serviceType', sd."serviceType",
             'createdAt', sd."createdAt",
@@ -236,16 +257,30 @@ module.exports = {
   },
   getRelatedService: async (id, serviceTypeId, limit = 5) => {
     try {
-      const service = await models.service.findAll({
-        where: {
-          id: {
-            [models.Sequelize.Op.not]: id,
-          },
+      const service = await models.DbConnection.query(`
+        select 
+          s.*,
+          i.url "imageUrl"
+        from services s 
+        left join "pivotImages" pi2
+          on pi2."pivotImgId" = s."pivotImgId"
+        join images i 
+          on i.id = pi2."imageId"
+          and i."isMainImg" = true
+        where 
+          s.id != :id
+          and s."serviceTypeId" = :serviceTypeId
+          and s."deletedAt" is null
+        limit :limit
+      `, {
+        replacements: {
+          id,
           serviceTypeId,
-          deletedAt: null,
+          limit,
         },
-        limit
-      });
+        raw: true,
+        type: models.Sequelize.QueryTypes.SELECT,
+      })
       return service;
     } catch (error) {
       error.code = STATUS_CODES.InternalServerError;

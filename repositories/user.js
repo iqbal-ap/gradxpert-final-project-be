@@ -12,6 +12,7 @@ module.exports = {
         email,
         phoneNumber,
         role: role,
+        pivotImgId: 16, // * Currently, only passing default value 
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -86,11 +87,30 @@ module.exports = {
       throw error;
     }
   },
-  getUser: async (filterObj, scope = 'abc') => {
+  getUser: async (whereClauses, replacementsObj, password = '') => {
     try {      
-      const user = await models.user.scope(scope).findOne({
-        where: filterObj,
-      });
+      const user = await models.DbConnection.query(`
+        select 
+          u.id,
+          u.username, ${password}
+          u.email,
+          u."phoneNumber",
+          u."role",
+          u."pivotImgId",
+          i.url "imageUrl",
+          u."createdAt",
+          u."updatedAt",
+          u."deletedAt"
+        from users u 
+        left join "pivotImages" pi2 on u."pivotImgId" = pi2."pivotImgId" 
+        left join images i on i.id = pi2."imageId" 
+        where 
+          ${whereClauses};
+      `, {
+        replacements: replacementsObj,
+        type: models.Sequelize.QueryTypes.SELECT,
+        raw: true,
+      }).then(res => res[0])
       return user;
     } catch (error) {
       error.code = STATUS_CODES.InternalServerError;
@@ -129,8 +149,13 @@ module.exports = {
             u.id,
             u.username,
             u.email,
+            i.url "imageUrl",
             1 as join_key
           from users u
+          left join "pivotImages" pi2 on u."pivotImgId" = pi2."pivotImgId" 
+          join images i 
+            on i.id = pi2."imageId"
+            and i."isMainImg" = true
           where 
             u.id = :id
             and u."deletedAt" is null
@@ -141,11 +166,16 @@ module.exports = {
               'id', s.id,
               'name', s.name,
               'rating', s.rating,
-              'description', s.description
+              'description', s.description,
+              'imageUrl', i.url
             ) services 
           from reviews r
           right join user_data ud on ud.id = r."userId" 
           join services s on s.id = r."serviceId" 
+          left join "pivotImages" pi2 on s."pivotImgId" = pi2."pivotImgId" 
+          join images i 
+            on i.id = pi2."imageId"
+            and i."isMainImg" = true
           where ${whereClauses}
           order by ${sorting}
         ), paginated_review_data as (
@@ -173,6 +203,7 @@ module.exports = {
             'id', ud.id,
             'username', ud.username,
             'email', ud.email,
+            'imageUrl', ud."imageUrl",
             'reviews', prd.reviews
           ) as data
         from user_data ud
