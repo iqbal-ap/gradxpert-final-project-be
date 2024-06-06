@@ -2,7 +2,6 @@
 const {
   Model
 } = require('sequelize');
-const { IsEmail } = require('@sequelize/validator.js');
 
 module.exports = (sequelize, DataTypes) => {
   class user extends Model {
@@ -13,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      user.belongsToMany(models.review)
+      user.hasMany(models.review)
     }
   }
   user.init({
@@ -31,43 +30,50 @@ module.exports = (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-      IsEmail,
+      validate: {
+        isEmail: true,
+      }
     },
     phoneNumber: {
       type: DataTypes.STRING,
       allowNull: true,
-      field: 'phone_number',
     },
     role: {
       type: DataTypes.ENUM('admin', 'user'),
       allowNull: false,
       defaultValue: 'user',
     },
+    pivotImgId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      field: 'created_at',
     },
     updatedAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      field: 'updated_at',
     },
     deletedAt: {
       allowNull: true,
       type: DataTypes.DATE,
-      field: 'deleted_at',
     }
   }, {
     sequelize,
     modelName: 'user',
-    underscored: true,
+    scopes: {
+      auth: {},
+      nonAuth: {
+        attributes: { exclude: ['password'] },
+      }
+    }
   });
   return user;
 };

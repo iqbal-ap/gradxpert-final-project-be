@@ -2,8 +2,9 @@
 const {
   Model
 } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
-  class review extends Model {
+  class image extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,64 +12,45 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      review.belongsTo(models.service, {
-        foreignKey: 'serviceId'
-      });
-      review.belongsTo(models.user, {
-        foreignKey: 'userId'
-      });
+      image.belongsTo(models.pivotImage)
     }
   }
-  review.init({
+  image.init({
     id: {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
-      type: DataTypes.INTEGER
-    },
-    serviceId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'services',
-        key: 'id',
-      },
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'users',
-        key: 'id',
-      },
+      unique: true,
     },
     description: {
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    rating: {
-      type: DataTypes.REAL,
+    url: {
+      type: DataTypes.TEXT,
       allowNull: false,
-      validate: {
-        min: 0,
-        max: 5,
-      }
+    },
+    isMainImg: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
     createdAt: {
       allowNull: false,
-      type: DataTypes.DATE,
+      type: DataTypes.DATE
     },
     updatedAt: {
       allowNull: false,
-      type: DataTypes.DATE,
+      type: DataTypes.DATE
     },
     deletedAt: {
       allowNull: true,
-      type: DataTypes.DATE,
+      type: DataTypes.DATE
     },
   }, {
     sequelize,
-    modelName: 'review',
+    modelName: 'image',
   });
-  return review;
+  return image;
 };

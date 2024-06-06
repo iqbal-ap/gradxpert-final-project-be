@@ -1,12 +1,10 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class service extends Model {
     static associate(models) {
-      service.belongsTo(models.service_type, {
-        foreignKey: 'service_type_id'
+      service.belongsTo(models.serviceType, {
+        foreignKey: 'serviceTypeId'
       });
       service.hasMany(models.review);
     }
@@ -16,51 +14,53 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       unique: true,
     },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    description: DataTypes.STRING,
+    description: DataTypes.TEXT,
     rating: {
       type: DataTypes.REAL,
       allowNull: false,
+      validate: {
+        min: 0,
+        max: 5,
+      }
     },
-    address: DataTypes.STRING,
+    address: DataTypes.TEXT,
     phoneNumber: {
       type: DataTypes.STRING,
-      field: 'phone_number',
     },
     serviceTypeId: {
       type: DataTypes.INTEGER,
-      field: 'service_type_id',
       references: {
-        model: 'service_types',
+        model: 'serviceTypes',
         key: 'id',
       },
       allowNull: false,
     },
+    pivotImgId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      field: 'created_at',
     },
     updatedAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      field: 'updated_at',
     },
     deletedAt: {
       allowNull: true,
       type: DataTypes.DATE,
-      field: 'deleted_at',
     }
   }, {
     sequelize,
     modelName: 'service',
-    underscored: true,
   });
   return service;
 };

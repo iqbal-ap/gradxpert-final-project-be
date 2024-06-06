@@ -18,35 +18,35 @@ module.exports = {
         allowNull: false,
       },
       description: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       rating: {
         type: Sequelize.REAL,
         allowNull: false,
       },
       address: {
+        type: Sequelize.TEXT,
+      },
+      phoneNumber: {
         type: Sequelize.STRING,
       },
-      phone_number: {
-        type: Sequelize.STRING,
-      },
-      service_type_id: {
+      serviceTypeId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'service_types',
+          model: 'serviceTypes',
           key: 'id',
         },
         allowNull: false,
       },
-      created_at: {
+      createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      updated_at: {
+      updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      deleted_at: {
+      deletedAt: {
         allowNull: true,
         type: Sequelize.DATE,
       }

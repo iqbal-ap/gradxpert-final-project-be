@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      service_id: {
+      serviceId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -17,7 +17,7 @@ module.exports = {
           key: 'id',
         },
       },
-      user_id: {
+      userId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -26,22 +26,22 @@ module.exports = {
         },
       },
       description: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: true,
       },
-      review: {
-        type: Sequelize.INTEGER,
+      rating: {
+        type: Sequelize.REAL,
         allowNull: false,
       },
-      created_at: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updated_at: {
+      createdAt: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      deleted_at: {
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      deletedAt: {
         allowNull: true,
         type: Sequelize.DATE
       }
