@@ -12,7 +12,7 @@ module.exports = {
         email,
         phoneNumber,
         role: role,
-        pivotImgId: 16, // * Currently, only passing default value 
+        pivotImgId: 1, // * Currently, only passing default value 
         createdAt: new Date(),
         updatedAt: new Date(),
       },

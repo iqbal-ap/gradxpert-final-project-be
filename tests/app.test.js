@@ -32,12 +32,6 @@ beforeAll(async () => {
   await authenticateDb(models.DbConnection);
 });
 
-afterAll(() => {
-  console.log('+++++++CREATED SERVICE TYPE IDs+++++++++')
-  console.log(createdServiceTypeIds)
-  console.log('+++++++CREATED SERVICE TYPE IDs+++++++++')
-})
-
 describe('GET /', () => {
   test('should respond with a 200 status code', async () => {
     const response = await request(app).get('/');
@@ -338,18 +332,18 @@ describe('GET /api/v1/services', () => {
         },
         // * Custom 'keyword'
         {
-          keyword: 'vi'
+          keyword: 'klinik'
         },
         {
-          keyword: 'erv'
+          keyword: 'apotik'
         },
         // * Custom all
         {
-          page: 4,
+          page: 2,
           show: 1,
           sortBy: 'createdAt',
           sortingMethod: 'desc',
-          keyword: 'rvic',
+          keyword: 'rumah sakit',
         },
       ];
 
@@ -3445,14 +3439,28 @@ describe('PUT /api/v1/service-types/:id', () => {
   describe('given valid admin token & valid params', () => {
     test('should respond with a 200 status code & valid response', async () => {
       const payloads = generateRandomServiceTypePayloads();
-      for (let i = 0; i < createdServiceTypeIds; i++) {
+      for (let i = 0; i < createdServiceTypeIds.length; i++) {
         const id = createdServiceTypeIds[i];
         const path = generatePath(id);
         const payload = payloads[i];
-        const response = await request(app).post(path).set(validHeader).send(payload);
+        const response = await request(app).put(path).set(validHeader).send(payload);
         expect(response.statusCode).toBe(200);
         expect(response.body.data).toHaveProperty('id');
         expect(response.body.data).toHaveProperty('name');
+      }
+    });
+  });
+
+  describe('given valid admin token & valid params, but not dounf "id"', () => {
+    test('should respond with a 200 status code & valid response', async () => {
+      const payloads = generateRandomServiceTypePayloads();
+      for (let i = 0; i < createdServiceTypeIds.length; i++) {
+        const id = createdServiceTypeIds[i];
+        const path = generatePath(id * 100000);
+        const payload = payloads[i];
+        const response = await request(app).put(path).set(validHeader).send(payload);
+        expect(response.statusCode).toBe(404);
+        expect(response.body.data).toStrictEqual({});
       }
     });
   });
@@ -3463,7 +3471,7 @@ describe('PUT /api/v1/service-types/:id', () => {
         const id = createdServiceTypeIds[i];
         const path = generatePath(id);
         const payload = createdServiceTypePayloads[i];
-        const response = await request(app).post(path).set(validHeader).send(payload);
+        const response = await request(app).put(path).set(validHeader).send(payload);
         expect(response.statusCode).toBe(400);
         expect(response.body.data).toStrictEqual({});
       }
@@ -3479,11 +3487,11 @@ describe('PUT /api/v1/service-types/:id', () => {
         {},
         {},
       ];
-      for (let i = 0; i < createdServiceTypeIds; i++) {
+      for (let i = 0; i < createdServiceTypeIds.length; i++) {
         const id = createdServiceTypeIds[i];
-        const path = generatePath(id);
+        const path = id < 3 ? generatePath(id) : generatePath(`${id}-abc`);
         const payload = payloads[i];
-        const response = await request(app).post(path).set(validHeader).send(payload);
+        const response = await request(app).put(path).set(validHeader).send(payload);
         expect(response.statusCode).toBe(400);
         expect(response.body.data).toStrictEqual({});
       }
@@ -3493,25 +3501,24 @@ describe('PUT /api/v1/service-types/:id', () => {
   describe('given valid user token & valid params', () => {
     test('should respond with a 401 status code & valid response', async () => {
       const payloads = generateRandomServiceTypePayloads();
-      for (let i = 0; i < createdServiceTypeIds; i++) {
+      for (let i = 0; i < createdServiceTypeIds.length; i++) {
         const id = createdServiceTypeIds[i];
         const path = generatePath(id);
         const payload = payloads[i];
-        const response = await request(app).post(path).set(validUserHeader).send(payload);
+        const response = await request(app).put(path).set(validUserHeader).send(payload);
         expect(response.statusCode).toBe(401);
-        expect(response.body.data).toHaveProperty('id');
-        expect(response.body.data).toHaveProperty('name');
+        expect(response.body.data).toStrictEqual({});
       }
     });
   });
 
   describe('given valid user token & valid params, but already exists', () => {
     test('should respond with a 401 status code & valid response', async () => {;
-      for (let i = 0; i < createdServiceTypeIds; i++) {
+      for (let i = 0; i < createdServiceTypeIds.length; i++) {
         const id = createdServiceTypeIds[i];
         const path = generatePath(id);
         const payload = createdServiceTypePayloads[i];
-        const response = await request(app).post(path).set(validUserHeader).send(payload);
+        const response = await request(app).put(path).set(validUserHeader).send(payload);
         expect(response.statusCode).toBe(401);
         expect(response.body.data).toStrictEqual({});
       }
@@ -3527,11 +3534,11 @@ describe('PUT /api/v1/service-types/:id', () => {
         {},
         {},
       ];
-      for (let i = 0; i < createdServiceTypeIds; i++) {
+      for (let i = 0; i < createdServiceTypeIds.length; i++) {
         const id = createdServiceTypeIds[i];
-        const path = generatePath(id);
+        const path = id < 3 ? generatePath(id) : generatePath(`${id}-abc`);
         const payload = payloads[i];
-        const response = await request(app).post(path).set(validUserHeader).send(payload);
+        const response = await request(app).put(path).set(validUserHeader).send(payload);
         expect(response.statusCode).toBe(401);
         expect(response.body.data).toStrictEqual({});
       }
@@ -3541,25 +3548,24 @@ describe('PUT /api/v1/service-types/:id', () => {
   describe('given invalid token & valid params', () => {
     test('should respond with a 401 status code & valid response', async () => {
       const payloads = generateRandomServiceTypePayloads();
-      for (let i = 0; i < createdServiceTypeIds; i++) {
+      for (let i = 0; i < createdServiceTypeIds.length; i++) {
         const id = createdServiceTypeIds[i];
         const path = generatePath(id);
         const payload = payloads[i];
-        const response = await request(app).post(path).set(invalidHeader).send(payload);
+        const response = await request(app).put(path).set(invalidHeader).send(payload);
         expect(response.statusCode).toBe(401);
-        expect(response.body.data).toHaveProperty('id');
-        expect(response.body.data).toHaveProperty('name');
+        expect(response.body.data).toStrictEqual({});
       }
     });
   });
 
   describe('given invalid token & valid params, but already exists', () => {
     test('should respond with a 401 status code & valid response', async () => {;
-      for (let i = 0; i < createdServiceTypeIds; i++) {
+      for (let i = 0; i < createdServiceTypeIds.length; i++) {
         const id = createdServiceTypeIds[i];
         const path = generatePath(id);
         const payload = createdServiceTypePayloads[i];
-        const response = await request(app).post(path).set(invalidHeader).send(payload);
+        const response = await request(app).put(path).set(invalidHeader).send(payload);
         expect(response.statusCode).toBe(401);
         expect(response.body.data).toStrictEqual({});
       }
@@ -3575,11 +3581,11 @@ describe('PUT /api/v1/service-types/:id', () => {
         {},
         {},
       ];
-      for (let i = 0; i < createdServiceTypeIds; i++) {
+      for (let i = 0; i < createdServiceTypeIds.length; i++) {
         const id = createdServiceTypeIds[i];
-        const path = generatePath(id);
+        const path = id < 3 ? generatePath(id) : generatePath(`${id}-abc`);
         const payload = payloads[i];
-        const response = await request(app).post(path).set(invalidHeader).send(payload);
+        const response = await request(app).put(path).set(invalidHeader).send(payload);
         expect(response.statusCode).toBe(401);
         expect(response.body.data).toStrictEqual({});
       }
@@ -3605,7 +3611,7 @@ describe('DELETE /api/v1/service-types/:id', () => {
   });
 
   describe('given valid admin token & valid params, but not found "id"', () => {
-    test('should respond with a 200 status code & valid response', async () => {
+    test('should respond with a 404 status code & valid response', async () => {
       for (const id of createdServiceTypeIds) {
         const path = generatePath(id * 1000000);
         const response = await request(app).delete(path).set(validHeader);
@@ -3616,7 +3622,7 @@ describe('DELETE /api/v1/service-types/:id', () => {
   });
 
   describe('given valid admin token & invalid params', () => {
-    test('should respond with a 200 status code & valid response', async () => {
+    test('should respond with a 400 status code & valid response', async () => {
       for (const id of createdServiceTypeIds) {
         const path = generatePath(`${id}-abc`);
         const response = await request(app).delete(path).set(validHeader);

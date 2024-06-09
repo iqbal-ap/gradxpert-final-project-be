@@ -15,17 +15,27 @@ module.exports = {
     */
    await queryInterface.bulkInsert(tableName, [
      {
-       name: 'Service Type 1',
+       name: 'Rumah Sakit',
        createdAt: new Date(),
        updatedAt: new Date(),
      },
      {
-       name: 'Service Type 2',
+       name: 'Laboratorium',
        createdAt: new Date(),
        updatedAt: new Date(),
      },
      {
-       name: 'Service Type 3',
+       name: 'Klinik',
+       createdAt: new Date(),
+       updatedAt: new Date(),
+     },
+     {
+       name: 'Dental Klinik',
+       createdAt: new Date(),
+       updatedAt: new Date(),
+     },
+     {
+       name: 'Apotik',
        createdAt: new Date(),
        updatedAt: new Date(),
      },
