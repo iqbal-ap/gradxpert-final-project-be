@@ -37,7 +37,7 @@ module.exports = {
       updatedAt: new Date(),
     },
     {
-      name: '‘Rumah Sakit Cemerlang Abadi',
+      name: 'Rumah Sakit Cemerlang Abadi',
       description: 'Sebagai pusat kegawatdaruratan terkemuka, Rumah Sakit Cemerlang Abadi menonjol dalam penanganan kondisi medis yang kompleks. Didukung oleh teknologi mutakhir dan tim spesialis terlatih, mereka memberikan perawatan berkualitas tinggi dengan efisiensi maksimal. Dari keadaan darurat hingga pemulihan, rumah sakit ini memprioritaskan keselamatan dan kesembuhan pasien dengan komitmen tak tergoyahkan.',
       rating: 0,
       address: 'Jl. Terang Budi No. 88, Kelurahan Cemerlang, Kota Maju Jaya, Provinsi Sentosa',
